@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Confirm payment</title>
+    <link rel="stylesheet" type="text/css" href="confirm.css" />
+  </head>
+  <body>
+    <nav>
+      <form action="/activeBooking" method="POST">
+        <button
+          type="submit"
+          name="booking_type"
+          value="active"
+          class="nav-item active"
+        >
+          Active booking
+        </button>
+      </form>
+      <form action="/confirmPayment" method="POST">
+        <button
+          type="submit"
+          name="booking_type"
+          value="confirm"
+          class="nav-item"
+        >
+          Confirm of payment
+        </button>
+      </form>
+    </nav>
+
+    <table>
+      <tbody>
+        <% booking.forEach(function(user) { %>
+        <tr>
+          <td><%= user.date %></td>
+          <td><%= user.time %></td>
+          <td><%= user.classRoom %></td>
+          <td><%= user.night %> ночі</td>
+          <td><%= user.price %> грн</td>
+          <td><%= user.phoneNumber %></td>
+          <td>
+            <form method="POST" action="/confirmBooking">
+              <input
+                type="hidden"
+                name="userName"
+                value="<%= user.userName %>"
+              />
+              <input type="hidden" name="date" value="<%= user.date %>" />
+              <input type="hidden" name="time" value="<%= user.time %>" />
+              <input
+                type="hidden"
+                name="beforeDate"
+                value="<%= user.beforeDate %>"
+              />
+              <input
+                type="hidden"
+                name="classRoom"
+                value="<%= user.classRoom %>"
+              />
+              <input type="hidden" name="night" value="<%= user.night %>" />
+              <input type="hidden" name="price" value="<%= user.price %>" />
+              <input
+                type="hidden"
+                name="phoneNumber"
+                value="<%= user.phoneNumber %>"
+              />
+              <input
+                type="hidden"
+                name="fullName"
+                value="<%= user.fullName %>"
+              />
+              <button>Confirm</button>
+            </form>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="home.css" />
+  </head>
+  <body>
+    <nav>
+      <form action="/activeBooking" method="POST">
+        <button
+          type="submit"
+          name="booking_type"
+          value="active"
+          class="nav-item active"
+        >
+          Active booking
+        </button>
+      </form>
+      <form action="/confirmPayment" method="POST">
+        <button
+          type="submit"
+          name="booking_type"
+          value="confirm"
+          class="nav-item"
+        >
+          Confirm of payment
+        </button>
+      </form>
+    </nav>
+    <div class="welcome">
+      <h1>Welcome</h1>
+    </div>
+  </body>
+</html>

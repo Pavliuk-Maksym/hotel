@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Active Bookings</title>
+    <link rel="stylesheet" type="text/css" href="ective.css" />
+  </head>
+  <body>
+    <nav>
+      <form action="/activeBooking" method="POST">
+        <button
+          type="submit"
+          name="booking_type"
+          value="active"
+          class="nav-item active"
+        >
+          Active booking
+        </button>
+      </form>
+      <form action="/confirmPayment" method="POST">
+        <button
+          type="submit"
+          name="booking_type"
+          value="confirm"
+          class="nav-item"
+        >
+          Confirm of payment
+        </button>
+      </form>
+    </nav>
+    <table>
+      <tbody>
+        <% let count = 1; %> <% client.forEach(function(user) { %>
+        <tr>
+          <td><%= count %></td>
+          <td><%= user.fullName %></td>
+          <td><%= user.phoneNumber %></td>
+          <td><%= user.classRoom %></td>
+        </tr>
+        <% count++; %> <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>
