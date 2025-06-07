@@ -5,15 +5,6 @@ import start from "./start.js";
 import Room from "../modules/rooms.js";
 import Booking from "../modules/booking.js";
 import Confirm from "../modules/confirmBooking.js";
-import {
-  parseDate,
-  validateFullName,
-  validatePhone,
-  getRemainingRooms,
-  // handleRoomSelection,
-} from "./utils.js";
-
-import { roomDescriptions } from "./constants.js";
 
 const pickDate = new Scenes.BaseScene("pickDate");
 pickDate.enter(async (ctx) => {
@@ -23,69 +14,152 @@ pickDate.enter(async (ctx) => {
 
 pickDate.on("text", async (ctx) => {
   ctx.session.data.date = ctx.message.text.trim();
+  return ctx.scene.enter("checkDate");
+});
+
+const checkDate = new Scenes.BaseScene("checkDate");
+checkDate.enter(async (ctx) => {
+  const inputDate = ctx.session.data.date;
+  const today = new Date();
+
+  const regex = /^(\d{2}):(\d{2}):(\d{4})$/;
+  if (!regex.test(inputDate)) {
+    await ctx.reply("Помилка: Некоректний формат дати");
+    return ctx.scene.enter("pickDate");
+  }
+
+  const [day, month, year] = inputDate.split(":").map(Number);
+
+  // Проверка даты
+  if (day < 1 || day > 31 || month < 1 || month > 12) {
+    await ctx.reply("Помилка: Некоректний формат дати");
+    return ctx.scene.enter("pickDate");
+  }
+
+  const inputDateObj = new Date(year, month - 1, day);
+  const maxDate = new Date(2025, 11, 31);
+  const todayDateOnly = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  if (inputDateObj > maxDate) {
+    await ctx.reply("Помилка: Дата має бути до 31 грудня 2025 року");
+    return ctx.scene.enter("pickDate");
+  }
+
+  if (inputDateObj < todayDateOnly) {
+    await ctx.reply("Помилка: Дата не може бути меншою за сьогоднішню");
+    return ctx.scene.enter("pickDate");
+  }
+
+  // Функция для подсчёта свободных номеров по типу
+  const getRemainingRooms = async (classRoom) => {
+    const targetDate = inputDateObj;
+
+    const filterValidDates = (items) =>
+      items.filter(({ beforeDate }) => {
+        const [d, m, y] = beforeDate.split(":").map(Number);
+        const dateObj = new Date(y, m - 1, d);
+        return dateObj > targetDate;
+      }).length;
+
+    const [booking, confirm, room] = await Promise.all([
+      Booking.find({ classRoom }),
+      Confirm.find({ classRoom }),
+      Room.findOne({ classRoom }),
+    ]);
+
+    const countBooking = filterValidDates(booking);
+    const countConfirm = filterValidDates(confirm);
+
+    const remaining = room.quantity - countBooking - countConfirm;
+    return Math.max(remaining, 0);
+  };
+
+  const roomTypes = ["Економ", "Стандарт", "Напівлюкс", "Люкс"];
+  const availability = await Promise.all(
+    roomTypes.map((type) => getRemainingRooms(type))
+  );
+
+  const buttons = roomTypes.map((type, idx) => [
+    Markup.button.callback(`${type} ${availability[idx]}`, type),
+  ]);
+
+  await ctx.reply(
+    "На цю дату вільні такі номери",
+    Markup.inlineKeyboard(buttons)
+  );
+
   return ctx.scene.enter("messenger");
 });
 
 const messenger = new Scenes.BaseScene("messenger");
 
-messenger.enter(async (ctx) => {
-  await ctx.reply(
-    "Оберіть клас номеру:",
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Економ", "Економ")],
-      [Markup.button.callback("Стандарт", "Стандарт")],
-      [Markup.button.callback("Напівлюкс", "Напівлюкс")],
-      [Markup.button.callback("Люкс", "Люкс")],
-    ])
-  );
-});
+const roomDescriptions = {
+  Економ: `<b>Двокімнатний двомісний економ</b>
+Просторий двокімнатний номер середньою площею 40 м². Складається з вітальні, спальні та ванної кімнати. У спальні – одне двоспальне ліжко, у вітальні – розкладний диван. На вимогу надається дитяче ліжечко.
+Ціна: 1250 грн`,
 
-// async function handleRoomAction(ctx, classRoom) {
-//   const count = await Booking.countDocuments({
-//     classRoom,
-//     date: ctx.session.data.date,
-//   });
+  Стандарт: `<b>Двокімнатний двомісний стандарт</b>
+Просторий двокімнатний номер середньою площею 40 м². Складається з вітальні, спальні та ванної кімнати. У спальні – високоякісне ліжко king-size, у вітальні – розкладний диван. На вимогу надається дитяче ліжечко.
+Ціна: 1450 грн`,
 
-//   const total_rooms = await Room.countDocuments({ classRoom });
+  Напівлюкс: `<b>Однокімнатний одномісний напівлюкс</b>
+Покращений однокімнатний номер середньою площею 19 м². Ідеально підходить для ділових людей, котрі подорожують з комфортом. В номері одне полуторне ліжко.
+Ціна: 1700 грн`,
 
-//   const available = total_rooms - count;
+  Люкс: `<b>Двомісний люкс «Класік»</b>
+Розкішний двокімнатний номер або номер-студія середньою площею 60 м². Складається зі спальні, вітальні та ванної кімнати. У спальні – високоякісне ліжко king-size, у вітальні – розкладний диван. На вимогу надається дитяче ліжечко. Номер створений для найбільш вибагливих гостей.
+Ціна: 2700 грн`,
+};
 
-//   if (available <= 0) {
-//     await ctx.reply(
-//       "На жаль, на обрану вами дату немає вільних номерів, поверніться до списку та оберіть інший із запропонованих"
-//     );
-//     return ctx.scene.enter("pickDate");
-//   }
+const TOTAL_ROOMS = 5;
 
-//   const room = await Room.findOne({ classRoom });
-
-//   if (!room || !room.image) {
-//     await ctx.reply("Room not found");
-//     return;
-//   }
-
-//   for (const image of room.image) {
-//     await ctx.replyWithPhoto({ source: image });
-//   }
-
-//   await ctx.replyWithHTML(roomDescriptions[classRoom]);
-//   ctx.session.data.classRoom = classRoom;
-
-//   await ctx.reply(
-//     "Виберіть Бронювати чи вернутись",
-//     Markup.keyboard([["Бронювати", "Назад"]])
-//       .oneTime()
-//       .resize()
-//   );
-
-//   return ctx.scene.enter("backOrQuantityNight");
-// }
-
-["Економ", "Стандарт", "Напівлюкс", "Люкс"].forEach((classRoom) => {
-  messenger.action(classRoom, async (ctx) => {
-    await ctx.answerCbQuery();
-    return handleRoomSelection(ctx, classRoom, roomDescriptions[classRoom]);
+async function handleRoomAction(ctx, classRoom) {
+  // Считаем количество занятых броней на выбранную дату
+  const count = await Booking.countDocuments({
+    classRoom,
+    date: ctx.session.data.date,
   });
+
+  const available = TOTAL_ROOMS - count;
+
+  if (available <= 0) {
+    await ctx.reply(
+      "На жаль, на обрану вами дату немає вільних номерів, поверніться до списку та оберіть інший із запропонованих"
+    );
+    return ctx.scene.enter("checkDate");
+  }
+
+  const room = await Room.findOne({ classRoom });
+
+  if (!room || !room.image) {
+    await ctx.reply("Room not found");
+    return;
+  }
+
+  for (const image of room.image) {
+    await ctx.replyWithPhoto({ source: image });
+  }
+
+  await ctx.replyWithHTML(roomDescriptions[classRoom]);
+  ctx.session.data.classRoom = classRoom;
+
+  await ctx.reply(
+    "Виберіть Бронювати чи вернутись",
+    Markup.keyboard([["Бронювати", "Назад"]])
+      .oneTime()
+      .resize()
+  );
+
+  return ctx.scene.enter("backOrQuantityNight");
+}
+
+// Обработка для всех комнат через единый обработчик
+["Економ", "Стандарт", "Напівлюкс", "Люкс"].forEach((classRoom) => {
+  messenger.action(classRoom, (ctx) => handleRoomAction(ctx, classRoom));
 });
 
 const backOrQuantityNight = new Scenes.BaseScene("backOrQuantityNight");
@@ -98,7 +172,7 @@ backOrQuantityNight.hears("Бронювати", async (ctx) => {
 });
 
 backOrQuantityNight.hears("Назад", async (ctx) => {
-  return ctx.scene.enter("pickDate");
+  return ctx.scene.enter("checkDate");
 });
 
 const howManyNight = new Scenes.BaseScene("howManyNight");
@@ -121,8 +195,9 @@ fullName.enter(async (ctx) => {
 
 fullName.on("text", async (ctx) => {
   const input = ctx.message.text.trim();
+  const regex = /^([a-zA-Zа-яА-ЯёЁіІїЇєЄ']+(\s|$)){2}[a-zA-Zа-яА-ЯёЁіІїЇєЄ']+$/;
 
-  if (!validateFullName(input)) {
+  if (!regex.test(input)) {
     await ctx.reply("❌ Неправильний формат ПІБ. Спробуйте ще раз.");
     return;
   }
@@ -139,8 +214,9 @@ phone.enter(async (ctx) => {
 
 phone.on("text", async (ctx) => {
   const input = ctx.message.text.trim();
+  const regex = /^\+380\d{9}$/;
 
-  if (!validatePhone(input)) {
+  if (!regex.test(input)) {
     await ctx.reply(
       "❌ Неправильний формат. Приклад: +380937465892. Спробуйте ще раз."
     );
@@ -151,8 +227,8 @@ phone.on("text", async (ctx) => {
     /(\+380)(\d{2})(\d{3})(\d{2})(\d{2})/,
     "$1($2)-$3-$4-$5"
   );
-
   ctx.session.data.phoneNumber = formatted;
+
   return ctx.scene.enter("checkData");
 });
 
@@ -200,39 +276,39 @@ details.action("Так", async (ctx) => {
 });
 
 details.action("Ні", async (ctx) => {
-  return ctx.scene.enter("pickDate");
+  return ctx.scene.enter("checkDate");
 });
 
 const paid = new Scenes.BaseScene("paid");
 
 paid.hears("Сплачено", async (ctx) => {
+  const { date, night, classRoom, fullName, phoneNumber } = ctx.session.data;
   const user = ctx.update.message.from;
-  const { date, night, classRoom, phoneNumber, fullName } = ctx.session.data;
   const userId = user.id;
-  const userName = user.username;
-
-  const parsedDate = parseDate(date);
-  if (!parsedDate) {
-    await ctx.reply("❌ Сталася помилка при обробці дати. Спробуйте ще раз.");
-    return ctx.scene.enter("pickDate");
-  }
-
-  const nightCount = parseInt(night, 10);
-  parsedDate.setDate(parsedDate.getDate() + nightCount);
-  const days = String(parsedDate.getDate()).padStart(2, "0");
-  const months = String(parsedDate.getMonth() + 1).padStart(2, "0");
-  const years = parsedDate.getFullYear();
-  const beforeDate = `${days}:${months}:${years}`;
-
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const time = `${hours}:${minutes}`;
+  const userName = user.username || "unknown";
 
   const room = await Room.findOne({ classRoom });
-  const price = room.price * nightCount;
+  if (!room) {
+    await ctx.reply("Помилка: номер не знайдено. Спробуйте ще раз пізніше.");
+    return ctx.scene.enter("checkDate");
+  }
 
-  const newBooking = new Booking({
+  // Дата виїзду
+  const [day, month, year] = date.split(":").map(Number);
+  const checkIn = new Date(year, month - 1, day);
+  const checkOut = new Date(checkIn);
+  checkOut.setDate(checkOut.getDate() + parseInt(night));
+
+  const beforeDate = `${String(checkOut.getDate()).padStart(2, "0")}:${String(
+    checkOut.getMonth() + 1
+  ).padStart(2, "0")}:${checkOut.getFullYear()}`;
+
+  const now = new Date();
+  const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+  const price = room.price * parseInt(night);
+
+  const booking = new Booking({
     userName,
     userId,
     date,
@@ -246,19 +322,20 @@ paid.hears("Сплачено", async (ctx) => {
   });
 
   try {
-    await newBooking.save();
-    console.log("✅ Booking saved");
+    await booking.save();
+    console.log("✅ Бронювання збережено.");
+    await ctx.reply(
+      "✅ Чекайте на підтвердження бронювання. Статус та номер замовлення буде надіслано в бот."
+    );
   } catch (err) {
-    console.error("❌ DB save error:", err);
-    await ctx.reply("❌ Сталася помилка при збереженні бронювання.");
-    return;
+    console.error("❌ Помилка збереження у БД:", err);
+    await ctx.reply(
+      "❌ Виникла помилка при збереженні бронювання. Спробуйте пізніше."
+    );
+    return ctx.scene.enter("checkDate");
   }
 
-  await ctx.reply(
-    "✅ Чекайте на підтвердження бронювання. Ви отримаєте повідомлення із номером бронювання та статусом."
-  );
-
-  return start(ctx);
+  return start(ctx); // возвращает на старт
 });
 
 paid.hears("Назад", async (ctx) => {
@@ -267,6 +344,7 @@ paid.hears("Назад", async (ctx) => {
 
 export {
   pickDate,
+  checkDate,
   messenger,
   backOrQuantityNight,
   howManyNight,

@@ -22,6 +22,7 @@ import {
   checkData,
   details,
   paid,
+  checkDate,
 } from "./bot/chooseDate.js";
 
 import Admin from "./modules/administration.js";
@@ -47,6 +48,7 @@ const stage = new Scenes.Stage([
   checkScene,
   reservationScene,
   pickDate,
+  checkDate,
   messenger,
   backOrQuantityNight,
   howManyNight,
