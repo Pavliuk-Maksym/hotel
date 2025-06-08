@@ -9,7 +9,7 @@ import Confirm from "../modules/confirmBooking.js";
 const pickDate = new Scenes.BaseScene("pickDate");
 pickDate.enter(async (ctx) => {
   ctx.session.data = {};
-  await ctx.reply("Введіть дату в форматі: ДД:ММ:РРРР");
+  await ctx.reply("Введіть дату в форматі ДД:ММ:РРРР. Наприклад: 31:12:2025"); // Дату используя для тестов, потом убрать
 });
 
 pickDate.on("text", async (ctx) => {
@@ -87,8 +87,19 @@ checkDate.enter(async (ctx) => {
     Markup.button.callback(`${type} ${availability[idx]}`, type),
   ]);
 
+  const inputDateStr = `${String(day).padStart(2, "0")}:${String(
+    month
+  ).padStart(2, "0")}:${year}`;
+
+  if (availability.every((count) => count <= 0)) {
+    await ctx.reply(
+      `На дату ${inputDateStr} немає вільних номерів. Спробуйте іншу дату.`
+    );
+    return ctx.scene.enter("pickDate");
+  }
+
   await ctx.reply(
-    "На цю дату вільні такі номери",
+    `На дату ${inputDateStr} вільні такі номери`,
     Markup.inlineKeyboard(buttons)
   );
 
@@ -115,8 +126,6 @@ const roomDescriptions = {
 Ціна: 2700 грн`,
 };
 
-const TOTAL_ROOMS = 5;
-
 async function handleRoomAction(ctx, classRoom) {
   // Считаем количество занятых броней на выбранную дату
   const count = await Booking.countDocuments({
@@ -124,11 +133,13 @@ async function handleRoomAction(ctx, classRoom) {
     date: ctx.session.data.date,
   });
 
-  const available = TOTAL_ROOMS - count;
+  const rooms = await Room.find(); // Получаем все записи
+  const total_rooms = rooms.reduce((sum, room) => sum + room.quantity, 0);
+  const available = total_rooms - count;
 
   if (available <= 0) {
     await ctx.reply(
-      "На жаль, на обрану вами дату немає вільних номерів, поверніться до списку та оберіть інший із запропонованих"
+      `На жаль, на обрану вами дату немає вільних номерів классу "${classRoom}", поверніться до списку та оберіть інший із запропонованих`
     );
     return ctx.scene.enter("checkDate");
   }
@@ -154,7 +165,7 @@ async function handleRoomAction(ctx, classRoom) {
       .resize()
   );
 
-  return ctx.scene.enter("backOrQuantityNight");
+  return ctx.scene.enter("quantityNight");
 }
 
 // Обработка для всех комнат через единый обработчик
@@ -162,20 +173,24 @@ async function handleRoomAction(ctx, classRoom) {
   messenger.action(classRoom, (ctx) => handleRoomAction(ctx, classRoom));
 });
 
-const backOrQuantityNight = new Scenes.BaseScene("backOrQuantityNight");
+const quantityNight = new Scenes.BaseScene("quantityNight");
 
-backOrQuantityNight.hears("Бронювати", async (ctx) => {
+quantityNight.hears("Бронювати", async (ctx) => {
   await ctx.reply(
     "Введіть кількість ночей, які бажаєте провести в нашому готелі"
   );
   return ctx.scene.enter("howManyNight");
 });
 
-backOrQuantityNight.hears("Назад", async (ctx) => {
+quantityNight.hears("Назад", async (ctx) => {
   return ctx.scene.enter("checkDate");
 });
 
 const howManyNight = new Scenes.BaseScene("howManyNight");
+
+howManyNight.hears("Назад", async (ctx) => {
+  return ctx.scene.enter("checkDate");
+});
 
 howManyNight.on("text", async (ctx) => {
   const nights = parseInt(ctx.message.text);
@@ -191,6 +206,14 @@ const fullName = new Scenes.BaseScene("fullName");
 
 fullName.enter(async (ctx) => {
   await ctx.reply("Введіть ваші ПІБ за зразком — Комаров Василій Дмитрович");
+});
+
+fullName.hears("Назад", async (ctx) => {
+  await ctx.reply(
+    "Введіть кількість ночей, які бажаєте провести в нашому готелі"
+  );
+
+  return ctx.scene.enter("howManyNight");
 });
 
 fullName.on("text", async (ctx) => {
@@ -209,7 +232,11 @@ fullName.on("text", async (ctx) => {
 const phone = new Scenes.BaseScene("phone");
 
 phone.enter(async (ctx) => {
-  await ctx.reply("📱 Введіть номер телефону у форматі +380XXXXXXXXX");
+  await ctx.reply("📱 Введіть номер телефону у форматі +380123456789"); // Этот номер иссползую для тестов, заменить потом на +380XXXXXXXXX
+});
+
+phone.hears("Назад", async (ctx) => {
+  return ctx.scene.enter("fullName");
 });
 
 phone.on("text", async (ctx) => {
@@ -276,7 +303,7 @@ details.action("Так", async (ctx) => {
 });
 
 details.action("Ні", async (ctx) => {
-  return ctx.scene.enter("checkDate");
+  return ctx.scene.enter("phone");
 });
 
 const paid = new Scenes.BaseScene("paid");
@@ -346,7 +373,7 @@ export {
   pickDate,
   checkDate,
   messenger,
-  backOrQuantityNight,
+  quantityNight,
   howManyNight,
   fullName,
   phone,

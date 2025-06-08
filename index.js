@@ -15,7 +15,7 @@ import reservationScene from "./bot/reservation.js";
 import {
   pickDate,
   messenger,
-  backOrQuantityNight,
+  quantityNight,
   howManyNight,
   fullName,
   phone,
@@ -50,7 +50,7 @@ const stage = new Scenes.Stage([
   pickDate,
   checkDate,
   messenger,
-  backOrQuantityNight,
+  quantityNight,
   howManyNight,
   fullName,
   phone,
