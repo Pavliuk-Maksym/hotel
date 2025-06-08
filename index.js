@@ -14,16 +14,16 @@ import reservationScene from "./bot/reservation.js";
 
 import {
   pickDate,
+  checkDate,
   messenger,
   quantityNight,
   howManyNight,
-  fullName,
-  phone,
   checkData,
   details,
   paid,
-  checkDate,
-} from "./bot/chooseDate.js";
+  phone,
+  fullName,
+} from "./bot/booking/booking_exports.js";
 
 import Admin from "./modules/administration.js";
 import Booking from "./modules/booking.js";
