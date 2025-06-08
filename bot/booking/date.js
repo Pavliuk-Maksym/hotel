@@ -7,7 +7,7 @@ import Confirm from "../../modules/confirmBooking.js";
 const pickDate = new Scenes.BaseScene("pickDate");
 pickDate.enter(async (ctx) => {
   ctx.session.data = {};
-  await ctx.reply("Введіть дату в форматі ДД:ММ:РРРР. Наприклад: 31:12:2025"); // Дату используя для тестов, потом убрать
+  await ctx.reply("Введіть дату в форматі ДД:ММ:РРРР. Наприклад: 31:12:2025"); // Дату использую для тестов, потом убрать
 });
 
 pickDate.on("text", async (ctx) => {
@@ -30,7 +30,7 @@ checkDate.enter(async (ctx) => {
 
   // Проверка даты
   if (day < 1 || day > 31 || month < 1 || month > 12) {
-    await ctx.reply("Помилка: Некоректний формат дати");
+    await ctx.reply("Помилка: Некоректна дата");
     return ctx.scene.enter("pickDate");
   }
 
@@ -76,7 +76,8 @@ checkDate.enter(async (ctx) => {
     return Math.max(remaining, 0);
   };
 
-  const roomTypes = ["Економ", "Стандарт", "Напівлюкс", "Люкс"];
+  const roomTypes = await Room.distinct("classRoom");
+
   const availability = await Promise.all(
     roomTypes.map((type) => getRemainingRooms(type))
   );

@@ -7,6 +7,7 @@ const roomsSchema = new Schema({
   price: Number,
   quantity: Number,
   image: Array,
+  description: String,
 });
 
 const Room = mongoose.model("rooms", roomsSchema);

@@ -25,7 +25,7 @@ import {
   fullName,
 } from "./bot/booking/booking_exports.js";
 
-import Admin from "./modules/administration.js";
+import Admin from "./modules/administrations.js";
 import Booking from "./modules/booking.js";
 import Client from "./modules/clients.js";
 import Confirm from "./modules/confirmBooking.js";

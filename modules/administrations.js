@@ -13,6 +13,6 @@ const administrationSchema = new Schema({
   },
 });
 
-const Admin = mongoose.model("administration", administrationSchema);
+const Admin = mongoose.model("administrations", administrationSchema);
 
 export default Admin;
