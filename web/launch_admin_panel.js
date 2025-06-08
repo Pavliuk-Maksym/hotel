@@ -18,17 +18,14 @@ export function launchAdminPanel(bot) {
   app.use(bodyParser.json());
 
   app.set("view engine", "ejs");
-  app.use(
-    express.static(path.join(__dirname, "../website/views/activeBooking"))
-  );
-  app.use(
-    express.static(path.join(__dirname, "../website/views/confirmPayment"))
-  );
-  app.use(express.static(path.join(__dirname, "../website/views/home")));
-  app.use(express.static(path.join(__dirname, "../website/views/login")));
+  app.use(express.static(path.join(__dirname, "../web/views/activeBooking")));
+  app.use(express.static(path.join(__dirname, "../web/views/confirmPayment")));
+  app.use(express.static(path.join(__dirname, "../web/views/home")));
+  app.use(express.static(path.join(__dirname, "../web/views/login")));
+  app.use("/img", express.static(path.join(__dirname, "../img")));
 
   app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../website/views/login/index.html"));
+    res.sendFile(path.join(__dirname, "../web/views/login/index.html"));
   });
 
   app.post("/login", async (req, res) => {
@@ -47,14 +44,14 @@ export function launchAdminPanel(bot) {
   });
 
   app.get("/home", (req, res) => {
-    res.sendFile(path.join(__dirname, "../website/views/home/home.html"));
+    res.sendFile(path.join(__dirname, "../web/views/home/home.html"));
   });
 
   app.get("/confirmPayment", async (req, res) => {
     try {
       const booking = await Booking.find();
       res.render(
-        path.join(__dirname, "../website/views/confirmPayment/confirm.ejs"),
+        path.join(__dirname, "../web/views/confirmPayment/confirm.ejs"),
         {
           booking,
         }
@@ -69,7 +66,7 @@ export function launchAdminPanel(bot) {
     try {
       const booking = await Booking.find();
       res.render(
-        path.join(__dirname, "../website/views/confirmPayment/confirm.ejs"),
+        path.join(__dirname, "../web/views/confirmPayment/confirm.ejs"),
         {
           booking,
         }
@@ -84,7 +81,7 @@ export function launchAdminPanel(bot) {
     try {
       const client = await Client.find();
       res.render(
-        path.join(__dirname, "../website/views/activeBooking/active.ejs"),
+        path.join(__dirname, "../web/views/activeBooking/active.ejs"),
         {
           client,
         }
