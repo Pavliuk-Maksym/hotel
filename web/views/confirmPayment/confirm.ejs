@@ -3,30 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm payment</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Подтверждение оплаты</title>
+    <link rel="stylesheet" href="confirm.css">
   </head>
   <body>
-    <div class="container">
-      <h1>Подтверждение бронирования</h1>
-      
-      <div class="bookings-list">
-        <% if (booking && booking.length > 0) { %>
-          <% booking.forEach(book => { %>
-            <div class="booking-card">
-              <div class="booking-info">
-                <h3>Бронь #<%= book._id %></h3>
-                <p><strong>Клиент:</strong> <%= book.fullName %></p>
-                <p><strong>Телефон:</strong> <%= book.phoneNumber %></p>
-                <p><strong>Дата:</strong> <%= new Date(book.date).toLocaleDateString() %></p>
-                <p><strong>Время:</strong> <%= book.time %></p>
-                <p><strong>Номер:</strong> <%= book.classRoom %></p>
-                <p><strong>Количество ночей:</strong> <%= book.night %></p>
-                <p><strong>Стоимость:</strong> <%= book.price %> грн</p>
-              </div>
-              
-              <div class="booking-actions">
-                <form action="/confirmBooking" method="POST">
+    <nav>
+      <form action="/activeBooking" method="POST">
+        <button type="submit" class="nav-item">Active booking</button>
+      </form>
+      <form action="/confirmPayment" method="POST">
+        <button type="submit" class="nav-item active">Confirm of payment</button>
+      </form>
+    </nav>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Клиент</th>
+          <th>Телефон</th>
+          <th>Дата</th>
+          <th>Время</th>
+          <th>Номер</th>
+          <th>Ночей</th>
+          <th>Стоимость</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let count = 1; %>
+        <% if (bookings && bookings.length > 0) { %>
+          <% bookings.forEach(function(book) { %>
+            <tr>
+              <td><%= count %></td>
+              <td><%= book.fullName %></td>
+              <td><%= book.phoneNumber %></td>
+              <td><%= new Date(book.date).toLocaleDateString() %></td>
+              <td><%= book.time %></td>
+              <td><%= book.classRoom %></td>
+              <td><%= book.night %></td>
+              <td><%= book.price %> грн</td>
+              <td>
+                <form action="/confirmBooking" method="POST" style="display:inline-block;">
                   <input type="hidden" name="userName" value="<%= book.userName %>">
                   <input type="hidden" name="date" value="<%= book.date %>">
                   <input type="hidden" name="time" value="<%= book.time %>">
@@ -36,28 +53,23 @@
                   <input type="hidden" name="price" value="<%= book.price %>">
                   <input type="hidden" name="phoneNumber" value="<%= book.phoneNumber %>">
                   <input type="hidden" name="fullName" value="<%= book.fullName %>">
-                  <button type="submit" class="btn confirm">Подтвердить бронь</button>
+                  <button type="submit">Подтвердить</button>
                 </form>
-                
-                <form action="/declineBooking" method="POST" class="decline-form">
+                <form action="/declineBooking" method="POST" style="display:inline-block; margin-left:5px;">
                   <input type="hidden" name="userName" value="<%= book.userName %>">
                   <input type="hidden" name="fullName" value="<%= book.fullName %>">
                   <input type="hidden" name="classRoom" value="<%= book.classRoom %>">
-                  <input type="text" name="adminComment" placeholder="Причина отказа" required>
-                  <button type="submit" class="btn decline">Отклонить бронь</button>
+                  <input type="text" name="adminComment" placeholder="Причина отказа" required style="width:110px;">
+                  <button type="submit">Отклонить</button>
                 </form>
-              </div>
-            </div>
+              </td>
+            </tr>
+            <% count++; %>
           <% }); %>
         <% } else { %>
-          <p class="no-bookings">Нет активных заявок на бронирование</p>
+          <tr><td colspan="9">Нет активных заявок на бронирование</td></tr>
         <% } %>
-      </div>
-
-      <div class="navigation">
-        <a href="/home" class="btn back">Вернуться на главную</a>
-        <a href="/cancelRequests" class="btn cancel-requests">Заявки на отмену</a>
-      </div>
-    </div>
+      </tbody>
+    </table>
   </body>
 </html>
