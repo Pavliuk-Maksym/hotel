@@ -2,11 +2,13 @@ import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 import Admin from "../modules/administrations.js";
 import Booking from "../modules/booking.js";
 import Client from "../modules/clients.js";
 import Confirm from "../modules/confirmBooking.js";
+import CancelRequest from "../modules/cancelRequest.js";
 
 export function launchAdminPanel(bot) {
   const app = express();
@@ -24,6 +26,14 @@ export function launchAdminPanel(bot) {
   app.use(express.static(path.join(__dirname, "../web/views/home")));
   app.use(express.static(path.join(__dirname, "../web/views/login")));
   app.use("/img", express.static(path.join(__dirname, "../img")));
+
+  // Создаём папку для стилей, если нет
+  const cssDir = path.join(__dirname, "../public/css");
+  if (!fs.existsSync(cssDir)) {
+    fs.mkdirSync(cssDir, { recursive: true });
+  }
+
+  app.use('/css', express.static(cssDir));
 
   app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../web/views/login/index.html"));
@@ -65,7 +75,7 @@ export function launchAdminPanel(bot) {
 
   app.post("/activeBooking", async (req, res) => {
     try {
-      const client = await Client.find();
+      const client = await Confirm.find().sort({ date: 1 });
       res.render("activeBooking/active", { client });
     } catch (err) {
       console.error(err);
@@ -108,7 +118,7 @@ export function launchAdminPanel(bot) {
       return res.status(404).send("Бронь не найдена.");
     }
     await Booking.deleteOne({ _id: booking._id });
-    const confirm = new Confirm({ userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName });
+    const confirm = new Confirm({ userName, userId: booking.userId, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName });
     await confirm.save();
     // Отправляем уведомление пользователю в Telegram
     if (booking.userId && bot && bot.telegram) {
@@ -123,6 +133,58 @@ export function launchAdminPanel(bot) {
     }
     console.log("Подтверждена бронь: userName=" + userName + ", fullName=" + fullName + ", classRoom=" + classRoom + ", номер брони: " + confirm._id);
     res.redirect("/confirmPayment");
+  });
+
+  // Страница заявок на отмену
+  app.get("/cancelRequests", async (req, res) => {
+    const requests = await CancelRequest.find({ status: "pending" }).sort({ createdAt: 1 });
+    res.render("cancelRequests/cancel", { requests });
+  });
+
+  app.post("/cancelRequests", async (req, res) => {
+    const requests = await CancelRequest.find({ status: "pending" }).sort({ createdAt: 1 });
+    res.render("cancelRequests/cancel", { requests });
+  });
+
+  // Подтвердить отмену
+  app.post("/confirmCancel", async (req, res) => {
+    const { requestId } = req.body;
+    const request = await CancelRequest.findById(requestId);
+    if (!request) return res.status(404).send("Заявка не найдена");
+    request.status = "confirmed";
+    await request.save();
+    // Удаляем бронь из Confirm
+    await Confirm.deleteOne({ _id: request.bookingId });
+    // Уведомляем пользователя
+    if (request.userId && bot && bot.telegram) {
+      try {
+        await bot.telegram.sendMessage(
+          request.userId,
+          `Ваша заявка на отмену подтверждена!\nСумма возврата: ${request.refundAmount} грн (${request.refundPercentage}%)`
+        );
+      } catch (e) { console.error("Ошибка отправки уведомления об отмене:", e); }
+    }
+    res.redirect("/cancelRequests");
+  });
+
+  // Отклонить отмену
+  app.post("/declineCancel", async (req, res) => {
+    const { requestId, adminComment } = req.body;
+    const request = await CancelRequest.findById(requestId);
+    if (!request) return res.status(404).send("Заявка не найдена");
+    request.status = "declined";
+    request.adminComment = adminComment;
+    await request.save();
+    // Уведомляем пользователя
+    if (request.userId && bot && bot.telegram) {
+      try {
+        await bot.telegram.sendMessage(
+          request.userId,
+          `Ваша заявка на отмену отклонена. Причина: ${adminComment}`
+        );
+      } catch (e) { console.error("Ошибка отправки уведомления об отказе отмены:", e); }
+    }
+    res.redirect("/cancelRequests");
   });
 
   app.listen(PORT, () => {

@@ -3,42 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <title>Active Bookings</title>
-    <link rel="stylesheet" type="text/css" href="ective.css" />
+    <link rel="stylesheet" type="text/css" href="/css/confirm.css" />
   </head>
   <body>
     <nav>
       <form action="/activeBooking" method="POST">
-        <button
-          type="submit"
-          name="booking_type"
-          value="active"
-          class="nav-item active"
-        >
-          Active booking
-        </button>
+        <button type="submit" class="nav-item active">Active booking</button>
       </form>
       <form action="/confirmPayment" method="POST">
-        <button
-          type="submit"
-          name="booking_type"
-          value="confirm"
-          class="nav-item"
-        >
-          Confirm of payment
-        </button>
+        <button type="submit" class="nav-item">Confirm of payment</button>
+      </form>
+      <form action="/cancelRequests" method="POST">
+        <button type="submit" class="nav-item">Cancel requests</button>
       </form>
     </nav>
-    <table>
-      <tbody>
-        <% let count = 1; %> <% client.forEach(function(user) { %>
-        <tr>
-          <td><%= count %></td>
-          <td><%= user.fullName %></td>
-          <td><%= user.phoneNumber %></td>
-          <td><%= user.classRoom %></td>
-        </tr>
-        <% count++; %> <% }); %>
-      </tbody>
-    </table>
+    <div class="container">
+      <h1>Активные (подтверждённые) бронирования</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Клиент</th>
+            <th>Телефон</th>
+            <th>Дата</th>
+            <th>Номер</th>
+            <th>Ночей</th>
+            <th>Стоимость</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let count = 1; %>
+          <% if (client && client.length > 0) { %>
+            <% client.forEach(function(book) { %>
+              <tr>
+                <td><%= count %></td>
+                <td><%= book.fullName %></td>
+                <td><%= book.phoneNumber %></td>
+                <td><%= book.date ? new Date(book.date).toLocaleDateString() : '' %></td>
+                <td><%= book.classRoom %></td>
+                <td><%= book.night %></td>
+                <td><%= book.price %> грн</td>
+              </tr>
+              <% count++; %>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7">Нет активных подтверждённых броней</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>

@@ -7,6 +7,10 @@ const confirmSchema = new Schema({
     type: String,
     required: true,
   },
+  userId: {
+    type: String,
+    required: true,
+  },
   date: String,
   time: String,
   beforeDate: String,
