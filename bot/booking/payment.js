@@ -37,7 +37,7 @@ const details = new Scenes.BaseScene("details");
 details.action("Так", async (ctx) => {
   await ctx.replyWithHTML(
     `<b>Наші реквізити для сплати:</b>
-Отримувач коштів: “Чернівці”
+Отримувач коштів: "Чернівці"
 Код отримувача: 45861336
 Банк: КендіБанк
 Рахунок: UA2541323652000121456321457895`,
@@ -108,7 +108,15 @@ paid.hears("Сплачено", async (ctx) => {
     return ctx.scene.enter("checkDate");
   }
 
-  return start(ctx); // возвращает на старт
+  // Показываем главное меню без проверки возраста
+  await ctx.scene.leave();
+  await ctx.reply(
+    "Виберіть, що вас цікавить",
+    Markup.keyboard([["Ввести дату"], ["Порядок заселення", "Ваші бронювання"]])
+      .oneTime()
+      .resize()
+  );
+  return;
 });
 
 paid.hears("Назад", async (ctx) => {

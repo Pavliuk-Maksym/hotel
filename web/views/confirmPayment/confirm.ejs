@@ -2,80 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm payment</title>
-    <link rel="stylesheet" type="text/css" href="confirm.css" />
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <nav>
-      <form action="/activeBooking" method="POST">
-        <button
-          type="submit"
-          name="booking_type"
-          value="active"
-          class="nav-item active"
-        >
-          Active booking
-        </button>
-      </form>
-      <form action="/confirmPayment" method="POST">
-        <button
-          type="submit"
-          name="booking_type"
-          value="confirm"
-          class="nav-item"
-        >
-          Confirm of payment
-        </button>
-      </form>
-    </nav>
+    <div class="container">
+      <h1>Подтверждение бронирования</h1>
+      
+      <div class="bookings-list">
+        <% if (booking && booking.length > 0) { %>
+          <% booking.forEach(book => { %>
+            <div class="booking-card">
+              <div class="booking-info">
+                <h3>Бронь #<%= book._id %></h3>
+                <p><strong>Клиент:</strong> <%= book.fullName %></p>
+                <p><strong>Телефон:</strong> <%= book.phoneNumber %></p>
+                <p><strong>Дата:</strong> <%= new Date(book.date).toLocaleDateString() %></p>
+                <p><strong>Время:</strong> <%= book.time %></p>
+                <p><strong>Номер:</strong> <%= book.classRoom %></p>
+                <p><strong>Количество ночей:</strong> <%= book.night %></p>
+                <p><strong>Стоимость:</strong> <%= book.price %> грн</p>
+              </div>
+              
+              <div class="booking-actions">
+                <form action="/confirmBooking" method="POST">
+                  <input type="hidden" name="userName" value="<%= book.userName %>">
+                  <input type="hidden" name="date" value="<%= book.date %>">
+                  <input type="hidden" name="time" value="<%= book.time %>">
+                  <input type="hidden" name="beforeDate" value="<%= book.beforeDate %>">
+                  <input type="hidden" name="classRoom" value="<%= book.classRoom %>">
+                  <input type="hidden" name="night" value="<%= book.night %>">
+                  <input type="hidden" name="price" value="<%= book.price %>">
+                  <input type="hidden" name="phoneNumber" value="<%= book.phoneNumber %>">
+                  <input type="hidden" name="fullName" value="<%= book.fullName %>">
+                  <button type="submit" class="btn confirm">Подтвердить бронь</button>
+                </form>
+                
+                <form action="/declineBooking" method="POST" class="decline-form">
+                  <input type="hidden" name="userName" value="<%= book.userName %>">
+                  <input type="hidden" name="fullName" value="<%= book.fullName %>">
+                  <input type="hidden" name="classRoom" value="<%= book.classRoom %>">
+                  <input type="text" name="adminComment" placeholder="Причина отказа" required>
+                  <button type="submit" class="btn decline">Отклонить бронь</button>
+                </form>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p class="no-bookings">Нет активных заявок на бронирование</p>
+        <% } %>
+      </div>
 
-    <table>
-      <tbody>
-        <% booking.forEach(function(user) { %>
-        <tr>
-          <td><%= user.date %></td>
-          <td><%= user.time %></td>
-          <td><%= user.classRoom %></td>
-          <td><%= user.night %> ночі</td>
-          <td><%= user.price %> грн</td>
-          <td><%= user.phoneNumber %></td>
-          <td>
-            <form method="POST" action="/confirmBooking">
-              <input
-                type="hidden"
-                name="userName"
-                value="<%= user.userName %>"
-              />
-              <input type="hidden" name="date" value="<%= user.date %>" />
-              <input type="hidden" name="time" value="<%= user.time %>" />
-              <input
-                type="hidden"
-                name="beforeDate"
-                value="<%= user.beforeDate %>"
-              />
-              <input
-                type="hidden"
-                name="classRoom"
-                value="<%= user.classRoom %>"
-              />
-              <input type="hidden" name="night" value="<%= user.night %>" />
-              <input type="hidden" name="price" value="<%= user.price %>" />
-              <input
-                type="hidden"
-                name="phoneNumber"
-                value="<%= user.phoneNumber %>"
-              />
-              <input
-                type="hidden"
-                name="fullName"
-                value="<%= user.fullName %>"
-              />
-              <button>Confirm</button>
-            </form>
-          </td>
-        </tr>
-        <% }); %>
-      </tbody>
-    </table>
+      <div class="navigation">
+        <a href="/home" class="btn back">Вернуться на главную</a>
+        <a href="/cancelRequests" class="btn cancel-requests">Заявки на отмену</a>
+      </div>
+    </div>
   </body>
 </html>

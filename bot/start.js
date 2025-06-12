@@ -1,12 +1,9 @@
 import { Telegraf, Markup } from "telegraf";
 
+// Функция, которая запускается при старте бота
 async function start(ctx) {
-  await ctx.reply(
-    "Виберіть, що вас цікавить",
-    Markup.keyboard([["Ввести дату"], ["Порядок заселення", "Ваші бронювання"]])
-      .oneTime()
-      .resize()
-  );
+  // Переходим в сцену проверки возраста
+  await ctx.scene.enter("ageCheck");
 }
 
 export default start;
