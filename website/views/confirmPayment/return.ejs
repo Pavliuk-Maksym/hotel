@@ -2,12 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Confirm payment</title>
+    <title>Return payment</title>
     <link rel="stylesheet" type="text/css" href="confirm.css" />
   </head>
   <body>
     <nav>
-      <form action="/activeBooking" method="POST">
+      <form action="/activeBooking" method="GET">
         <button
           type="submit"
           name="booking_type"
@@ -17,7 +17,7 @@
           Active booking
         </button>
       </form>
-      <form action="/confirmPayment" method="POST">
+      <form action="/confirmPayment" method="GET">
         <button
           type="submit"
           name="booking_type"
@@ -50,7 +50,7 @@
           <td><%= user.price %> грн</td>
           <td><%= user.phoneNumber %></td>
           <td>
-            <form method="POST" action="/confirmBooking">
+            <form method="POST" action="/returnBooking">
               <input
                 type="hidden"
                 name="userName"
@@ -80,24 +80,7 @@
                 name="fullName"
                 value="<%= user.fullName %>"
               />
-              <button>Confirm</button>
-            </form>
-          </td>
-          <td>
-            <form method="POST" action="/deleteBooking">
-              <input
-                type="hidden"
-                name="userName"
-                value="<%= user.userName %>"
-              />
-              <input type="hidden" name="date" value="<%= user.date %>" />
-              <input type="hidden" name="time" value="<%= user.time %>" />
-              <input
-                type="hidden"
-                name="classRoom"
-                value="<%= user.classRoom %>"
-              />
-              <button type="submit" style="background-color: #ff4444; color: white;">Delete</button>
+              <button type="submit" style="background-color: #4CAF50; color: white;">Return</button>
             </form>
           </td>
         </tr>
@@ -105,4 +88,4 @@
       </tbody>
     </table>
   </body>
-</html>
+</html> 

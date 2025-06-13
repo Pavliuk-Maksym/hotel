@@ -35,7 +35,7 @@ const bot = new Telegraf(process.env.TOKEN_BOT);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3001;
 await mongoose
   .connect(process.env.URL_DB, {
     useNewUrlParser: true,
@@ -86,6 +86,7 @@ app.use(express.static(__dirname + "/website/views/activeBooking"));
 app.use(express.static(__dirname + "/website/views/confirmPayment"));
 app.use(express.static(__dirname + "/website/views/home"));
 app.use(express.static(__dirname + "/website/views/login"));
+app.use(express.static(__dirname + "/website/views/confirmPayment/return"));
 
 app.get("/", (req, res) => {
   try {
@@ -124,17 +125,18 @@ app.get("/home", async (req, res) => {
   }
 });
 
-app.post("/confirmPayment", async (req, res) => {
+app.get("/activeBooking", async (req, res) => {
   try {
-    const booking = await Booking.find();
+    const client = await Client.find();
     res.render(
-      path.join(__dirname, "website", "views", "confirmPayment", "confirm.ejs"),
+      path.join(__dirname, "website", "views", "activeBooking", "active.ejs"),
       {
-        booking,
+        client,
       }
     );
   } catch (err) {
     console.error(err);
+    res.status(500).send("Error loading active bookings");
   }
 });
 
@@ -149,20 +151,22 @@ app.get("/confirmPayment", async (req, res) => {
     );
   } catch (err) {
     console.error(err);
+    res.status(500).send("Error loading confirm payment page");
   }
 });
 
-app.post("/activeBooking", async (req, res) => {
+app.get("/returnPayment", async (req, res) => {
   try {
-    const client = await Client.find();
+    const booking = await Booking.find();
     res.render(
-      path.join(__dirname, "website", "views", "activeBooking", "active.ejs"),
+      path.join(__dirname, "website", "views", "confirmPayment", "return.ejs"),
       {
-        client,
+        booking,
       }
     );
   } catch (err) {
     console.error(err);
+    res.status(500).send("Error loading return payment page");
   }
 });
 
@@ -239,6 +243,53 @@ app.post("/confirmBooking", async (req, res) => {
     res.redirect("/confirmPayment");
   } catch (err) {
     console.error(err);
+  }
+});
+
+app.post("/deleteBooking", async (req, res) => {
+  try {
+    const { userName, date, time, classRoom } = req.body;
+    await Booking.deleteOne({
+      userName,
+      date,
+      time,
+      classRoom
+    });
+    res.redirect("/confirmPayment");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting booking");
+  }
+});
+
+app.post("/returnBooking", async (req, res) => {
+  try {
+    const { userName, date, time, classRoom } = req.body;
+    await Booking.deleteOne({
+      userName,
+      date,
+      time,
+      classRoom
+    });
+    res.redirect("/returnPayment");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error processing return");
+  }
+});
+
+app.post("/returnPayment", async (req, res) => {
+  try {
+    const booking = await Booking.find();
+    res.render(
+      path.join(__dirname, "website", "views", "confirmPayment", "return.ejs"),
+      {
+        booking,
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading return payment page");
   }
 });
 
