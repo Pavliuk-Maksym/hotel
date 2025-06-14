@@ -13,7 +13,7 @@ function mergeIntervals(entries) {
     const [d, m, y] = entry.date.split(":").map(Number);
     const start = new Date(y, m - 1, d);
     const end = new Date(start);
-    end.setDate(start.getDate() + (entry.night || 1));
+    end.setDate(start.getDate() + (entry.night || 1) + 2); // +2 дня після виїзду
     return [start, end];
   });
 
@@ -25,6 +25,7 @@ function mergeIntervals(entries) {
       merged.push([start, end]);
     } else {
       const last = merged[merged.length - 1];
+      // Об'єднуємо, якщо новий період починається під час або на наступний день після попереднього
       if (start <= new Date(last[1].getTime() + 86400000)) {
         last[1] = new Date(Math.max(last[1], end));
       } else {
@@ -37,7 +38,6 @@ function mergeIntervals(entries) {
 }
 
 howManyNight.hears("Назад", async (ctx) => {
-  await ctx.reply("Введіть дату заселення знову:");
   return ctx.scene.enter("pickDate");
 });
 
