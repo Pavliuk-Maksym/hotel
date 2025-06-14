@@ -8,7 +8,7 @@ const howManyNight = new Scenes.BaseScene("howManyNight");
 
 // utils/mergeIntervals.js
 
-export function mergeIntervals(entries) {
+function mergeIntervals(entries) {
   const intervals = entries.map((entry) => {
     const [d, m, y] = entry.date.split(":").map(Number);
     const start = new Date(y, m - 1, d);
