@@ -8,12 +8,12 @@ const howManyNight = new Scenes.BaseScene("howManyNight");
 
 // utils/mergeIntervals.js
 
-function mergeIntervals(entries) {
+export function mergeIntervals(entries) {
   const intervals = entries.map((entry) => {
     const [d, m, y] = entry.date.split(":").map(Number);
     const start = new Date(y, m - 1, d);
     const end = new Date(start);
-    end.setDate(start.getDate() + (entry.night || 1) + 2); // +2 дня після виїзду
+    end.setDate(start.getDate() + (entry.night || 1));
     return [start, end];
   });
 
@@ -25,7 +25,6 @@ function mergeIntervals(entries) {
       merged.push([start, end]);
     } else {
       const last = merged[merged.length - 1];
-      // Об'єднуємо, якщо новий період починається під час або на наступний день після попереднього
       if (start <= new Date(last[1].getTime() + 86400000)) {
         last[1] = new Date(Math.max(last[1], end));
       } else {
