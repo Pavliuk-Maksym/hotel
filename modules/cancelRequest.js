@@ -11,13 +11,17 @@ const cancelRequestSchema = new Schema({
   classRoom: { type: String, required: true },
   date: { type: String, required: true },
   price: { type: Number, required: true },
-  status: { type: String, enum: ["pending", "confirmed", "declined"], default: "pending" },
+  status: {
+    type: String,
+    enum: ["pending", "confirmed", "declined"],
+    default: "pending",
+  },
   refundAmount: { type: Number },
   refundPercentage: { type: Number },
   adminComment: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
 });
 
 const CancelRequest = mongoose.model("cancelRequest", cancelRequestSchema);
 
-export default CancelRequest; 
+export default CancelRequest;

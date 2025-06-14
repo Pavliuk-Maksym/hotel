@@ -1,16 +1,16 @@
-import { pickDate, checkDate } from "./date.js";
+import { pickDate } from "./date.js";
 import { fullName } from "./full_name.js";
 import { setupMessengerScene } from "./messenger.js";
-import { quantityNight, howManyNight } from "./nights.js";
+import { howManyNight } from "./nights.js";
 import { checkData, details, paid } from "./payment.js";
 import { phone } from "./phone.js";
 
 export {
   pickDate,
-  checkDate,
+  // checkDate,
   fullName,
   setupMessengerScene,
-  quantityNight,
+  // quantityNight,
   howManyNight,
   checkData,
   details,
