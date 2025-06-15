@@ -13,7 +13,7 @@ function mergeIntervals(entries) {
     const [d, m, y] = entry.date.split(":").map(Number);
     const start = new Date(y, m - 1, d);
     const end = new Date(start);
-    end.setDate(start.getDate() + (entry.night || 1));
+    end.setDate(start.getDate() + (entry.night || 1) + 2);
     return [start, end];
   });
 
