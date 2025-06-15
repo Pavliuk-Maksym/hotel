@@ -1,45 +1,23 @@
-import { Markup, Scenes } from "telegraf";
+// messenger.js
+import { Scenes, Markup } from "telegraf";
 import Room from "../../modules/rooms.js";
-import Booking from "../../modules/booking.js";
 
-/**
- * Обработчик действий при выборе типа комнаты
- */
 async function handleRoomAction(ctx, classRoom) {
-  const count = await Booking.countDocuments({
-    classRoom,
-    date: ctx.session.data.date,
-  });
-
-  const rooms = await Room.find();
-  const totalRooms = rooms.reduce((sum, room) => sum + room.quantity, 0);
-  const available = totalRooms - count;
-
-  if (available <= 0) {
-    await ctx.reply(
-      `На жаль, на обрану вами дату немає вільних номерів класу "${classRoom}", поверніться до списку та оберіть інший із запропонованих`
-    );
-    return ctx.scene.enter("checkDate");
-  }
+  ctx.session.data.classRoom = classRoom;
 
   const room = await Room.findOne({ classRoom });
-
-  if (!room || !room.image) {
-    await ctx.reply("Room not found");
+  if (!room) {
+    await ctx.reply("Не знайдено опису цього типу номеру");
     return;
   }
 
-  for (const image of room.image) {
-    await ctx.replyWithPhoto({ source: image });
+  if (room.image?.length) {
+    for (const image of room.image) {
+      await ctx.replyWithPhoto({ source: image });
+    }
   }
 
-  const roomDescriptions = {};
-  for (const r of rooms) {
-    roomDescriptions[r.classRoom] = r.description;
-  }
-
-  await ctx.replyWithHTML(roomDescriptions[classRoom]);
-  ctx.session.data.classRoom = classRoom;
+  await ctx.replyWithHTML(room.description || "Опис відсутній");
 
   await ctx.reply(
     "Виберіть Бронювати чи вернутись",
@@ -47,19 +25,30 @@ async function handleRoomAction(ctx, classRoom) {
       .oneTime()
       .resize()
   );
-
-  return ctx.scene.enter("quantityNight");
 }
 
-/**
- * Асинхронно создаёт и возвращает сцену messenger
- */
 export async function setupMessengerScene() {
   const roomTypes = await Room.distinct("classRoom");
   const messenger = new Scenes.BaseScene("messenger");
 
   roomTypes.forEach((classRoom) => {
     messenger.action(classRoom, (ctx) => handleRoomAction(ctx, classRoom));
+  });
+
+  messenger.hears("Назад", async (ctx) => {
+    await ctx.reply(
+      "Введіть кількість ночей, які бажаєте провести в готелі (1-30)"
+    );
+    await ctx.scene.enter("howManyNight");
+  });
+
+  messenger.hears("Бронювати", async (ctx) => {
+    const { classRoom } = ctx.session.data;
+    if (!classRoom) {
+      await ctx.reply("Будь ласка, спочатку виберіть номер.");
+      return;
+    }
+    return ctx.scene.enter("fullName");
   });
 
   return messenger;
