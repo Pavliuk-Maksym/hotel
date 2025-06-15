@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Active Bookings</title>
-    <link rel="stylesheet" type="text/css" href="/css/confirm.css" />
+    <link rel="stylesheet" type="text/css" href="ective.css" />
   </head>
   <body>
     <nav>
@@ -32,22 +32,23 @@
           </tr>
         </thead>
         <tbody>
-          <% let count = 1; %>
-          <% if (client && client.length > 0) { %>
-            <% client.forEach(function(book) { %>
-              <tr>
-                <td><%= count %></td>
-                <td><%= book.fullName %></td>
-                <td><%= book.phoneNumber %></td>
-                <td><%= book.date ? new Date(book.date).toLocaleDateString() : '' %></td>
-                <td><%= book.classRoom %></td>
-                <td><%= book.night %></td>
-                <td><%= book.price %> грн</td>
-              </tr>
-              <% count++; %>
-            <% }); %>
-          <% } else { %>
-            <tr><td colspan="7">Нет активных подтверждённых броней</td></tr>
+          <% let count = 1; %> <% if (client && client.length > 0) { %> <%
+          client.forEach(function(book) { %>
+          <tr>
+            <td><%= count %></td>
+            <td><%= book.fullName %></td>
+            <td><%= book.phoneNumber %></td>
+            <td>
+              <%= book.date ? new Date(book.date).toLocaleDateString() : '' %>
+            </td>
+            <td><%= book.classRoom %></td>
+            <td><%= book.night %></td>
+            <td><%= book.price %> грн</td>
+          </tr>
+          <% count++; %> <% }); %> <% } else { %>
+          <tr>
+            <td colspan="7">Нет активных подтверждённых броней</td>
+          </tr>
           <% } %>
         </tbody>
       </table>
