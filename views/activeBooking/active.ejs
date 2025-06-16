@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Active Bookings</title>
-    <link rel="stylesheet" type="text/css" href="ective.css" />
+    <link rel="stylesheet" type="text/css" href="/css/active.css" />
   </head>
   <body>
     <nav>
@@ -39,7 +39,10 @@
             <td><%= book.fullName %></td>
             <td><%= book.phoneNumber %></td>
             <td>
-              <%= book.date ? new Date(book.date).toLocaleDateString() : '' %>
+              <%= book.date ? (() => {
+                const [day, month, year] = book.date.split(':').map(Number);
+                return new Date(year, month - 1, day).toLocaleDateString('uk-UA', {day: '2-digit', month: '2-digit', year: 'numeric'});
+              })() : '' %>
             </td>
             <td><%= book.classRoom %></td>
             <td><%= book.night %></td>

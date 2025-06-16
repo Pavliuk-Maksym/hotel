@@ -14,29 +14,87 @@ export function launchAdminPanel(bot) {
   const app = express();
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const PORT = process.env.PORT || 3002;
+  const projectRoot = path.resolve(__dirname, "..");
+  const PORT = process.env.PORT || 3001;
 
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
-  app.set("views", path.join(__dirname, "../web/views"));
+  // Set views directory
+  app.set("views", path.join(projectRoot, "views"));
   app.set("view engine", "ejs");
-  app.use(express.static(path.join(__dirname, "../web/views/activeBooking")));
-  app.use(express.static(path.join(__dirname, "../web/views/confirmPayment")));
-  app.use(express.static(path.join(__dirname, "../web/views/home")));
-  app.use(express.static(path.join(__dirname, "../web/views/login")));
-  app.use("/img", express.static(path.join(__dirname, "../img")));
+  
+  // Serve static files
+  app.use(express.static(path.join(projectRoot, "views")));
+  app.use("/img", express.static(path.join(projectRoot, "img")));
+  app.use("/css", express.static(path.join(projectRoot, "public/css")));
 
-  // Создаём папку для стилей, если нет
-  const cssDir = path.join(__dirname, "../public/css");
+  // Debug middleware to log static file requests
+  app.use((req, res, next) => {
+    console.log('Request URL:', req.url);
+    next();
+  });
+
+  // Create CSS directory if it doesn't exist
+  const cssDir = path.join(projectRoot, "css");
   if (!fs.existsSync(cssDir)) {
     fs.mkdirSync(cssDir, { recursive: true });
   }
 
-  app.use('/css', express.static(cssDir));
+  // Create default style.css if it doesn't exist
+  const styleCssPath = path.join(cssDir, "style.css");
+  if (!fs.existsSync(styleCssPath)) {
+    const defaultCss = `
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f0f2f5;
+        font-family: Arial, sans-serif;
+      }
+      .modal {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+      h1 {
+        text-align: center;
+        color: #1a73e8;
+        margin-bottom: 1.5rem;
+      }
+      input {
+        width: 100%;
+        padding: 0.8rem;
+        margin: 0.5rem 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 0.8rem;
+        background: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+      button:hover {
+        background: #1557b0;
+      }
+    `;
+    fs.writeFileSync(styleCssPath, defaultCss.trim());
+  }
 
   app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../web/views/login/index.html"));
+    res.sendFile(path.join(projectRoot, "views/login/index.html"));
   });
 
   app.post("/login", async (req, res) => {
@@ -44,7 +102,8 @@ export function launchAdminPanel(bot) {
       const { username, password } = req.body;
       const user = await Admin.findOne({ username, password });
       if (user) {
-        res.redirect("/home");
+        const client = await Confirm.find().sort({ date: 1 });
+        res.render("activeBooking/active", { client });
       } else {
         res.redirect("/");
       }
@@ -52,10 +111,6 @@ export function launchAdminPanel(bot) {
       console.error(err);
       res.status(500).send("Server error");
     }
-  });
-
-  app.get("/home", (req, res) => {
-    res.sendFile(path.join(__dirname, "../web/views/home/home.html"));
   });
 
   app.get("/confirmPayment", async (req, res) => {
@@ -74,6 +129,16 @@ export function launchAdminPanel(bot) {
   });
 
   app.post("/activeBooking", async (req, res) => {
+    try {
+      const client = await Confirm.find().sort({ date: 1 });
+      res.render("activeBooking/active", { client });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Server error");
+    }
+  });
+
+  app.get("/activeBooking", async (req, res) => {
     try {
       const client = await Confirm.find().sort({ date: 1 });
       res.render("activeBooking/active", { client });
@@ -187,7 +252,9 @@ export function launchAdminPanel(bot) {
     res.redirect("/cancelRequests");
   });
 
+  // Start the server
   app.listen(PORT, () => {
     console.log(`🌐 Admin panel started on port ${PORT}`);
+    console.log(`📁 CSS directory: ${path.join(projectRoot, "public/css")}`);
   });
 }

@@ -3,7 +3,7 @@ dotenv.config();
 
 import mongoose from "mongoose";
 import { launchBot } from "./bot/launch_bot.js";
-import { launchAdminPanel } from "./web/launch_admin_panel.js";
+import { launchAdminPanel } from "./views/launch_admin_panel.js";
 
 (async () => {
   try {

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Запросы на отмену</title>
+    <link rel="stylesheet" href="css/cancel.css" />
+  </head>
+  <body>
+    <nav>
+      <form action="/activeBooking" method="POST">
+        <button type="submit" class="nav-item">Active booking</button>
+      </form>
+      <form action="/confirmPayment" method="POST">
+        <button type="submit" class="nav-item">Confirm of payment</button>
+      </form>
+      <form action="/cancelRequests" method="POST">
+        <button type="submit" class="nav-item active">Cancel requests</button>
+      </form>
+    </nav>
+    <div class="container"> 
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Клиент</th>
+            <th>Телефон</th>
+            <th>Дата</th>
+            <th>Номер</th>
+            <th>Сумма</th>
+            <th>Возврат</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let count = 1; %>
+          <% if (requests && requests.length > 0) { %>
+            <% requests.forEach(function(req) { %>
+              <tr>
+                <td><%= count %></td>
+                <td><%= req.fullName %></td>
+                <td><%= req.phoneNumber %></td>
+                <td>
+                  <%= req.date ? (() => {
+                    const [day, month, year] = req.date.split(':').map(Number);
+                    return new Date(year, month - 1, day).toLocaleDateString('uk-UA', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                  })() : '' %>
+                </td>
+                <td><%= req.classRoom %></td>
+                <td><%= req.price %> грн</td>
+                <td><%= req.refundAmount %> грн (<%= req.refundPercentage %>%)</td>
+                <td>
+                  <div class="action-buttons">
+                    <form action="/confirmCancel" method="POST">
+                      <input type="hidden" name="requestId" value="<%= req._id %>">
+                      <button type="submit" class="confirm-btn">Подтвердить</button>
+                    </form>
+                    <form action="/declineCancel" method="POST">
+                      <input type="hidden" name="requestId" value="<%= req._id %>">
+                      <input type="text" name="adminComment" placeholder="Причина отказа" required>
+                      <button type="submit" class="decline-btn">Отклонить</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% count++; %>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="8">Нет активных заявок на отмену</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

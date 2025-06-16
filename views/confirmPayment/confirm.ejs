@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подтверждение оплаты</title>
-    <link rel="stylesheet" href="confirm.css">
+    <link rel="stylesheet" href="css/confirm.css">
   </head>
   <body>
     <nav>
@@ -40,7 +40,10 @@
               <td><%= count %></td>
               <td><%= book.fullName %></td>
               <td><%= book.phoneNumber %></td>
-              <td><%= new Date(book.date).toLocaleDateString() %></td>
+              <td><%= (() => {
+                const [day, month, year] = book.date.split(':').map(Number);
+                return new Date(year, month - 1, day).toLocaleDateString('uk-UA', {day: '2-digit', month: '2-digit', year: 'numeric'});
+              })() %></td>
               <td><%= book.time %></td>
               <td><%= book.classRoom %></td>
               <td><%= book.night %></td>

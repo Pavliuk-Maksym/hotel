@@ -1,0 +1,163 @@
+body {
+  background: url("/img/web_background.png");
+  background-attachment: fixed;
+  background-position: top center;
+  background-size: cover;
+}
+
+/* Стили для навбара */
+nav {
+  background-color: #ffdfc4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  text-align: center;
+}
+
+.nav-item {
+  text-decoration: none;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: 10px;
+  color: #fff;
+  background-color: #db8018;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-item:hover {
+  background-color: #ddd;
+}
+
+.nav-item.active {
+  text-decoration: none;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: 10px;
+  color: #fff;
+  background-color: #db8018;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-item.active:hover {
+  background-color: #ddd;
+}
+
+/* Стили для таблицы */
+table {
+  margin-top: 100px;
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: scroll;
+  display: block;
+  max-height: 700px;
+}
+
+th,
+td {
+  width: 10%;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  text-align: center;
+  font-size: 22px;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+td button {
+  border: none;
+  background-color: #db8018;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+td button:hover {
+  background-color: #e29b49;
+  color: #fff;
+}
+
+/* Стили для скрола */
+table::-webkit-scrollbar {
+  width: 8px;
+  background-color: #d1d1d1;
+}
+
+table::-webkit-scrollbar-thumb {
+  background-color: #817474;
+  border-radius: 10px;
+}
+
+/* Стили для заголовка */
+.container h1 {
+  text-align: center;
+  color: #333;
+  margin-top: 120px;
+  margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* Стили для форм */
+form {
+  display: inline-block;
+  margin: 0 5px;
+}
+
+/* Стили для текстовых полей */
+input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-size: 16px;
+}
+
+/* Стили для кнопок действий */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.confirm-btn {
+  background-color: #4CAF50;
+}
+
+.decline-btn {
+  background-color: #f44336;
+}
+
+.confirm-btn:hover {
+  background-color: #45a049;
+}
+
+.decline-btn:hover {
+  background-color: #da190b;
+} 
