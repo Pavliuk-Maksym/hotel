@@ -102,11 +102,29 @@ td button {
   border-radius: 10px;
   cursor: pointer;
   font-size: 18px;
+  display: inline-block;
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 td button:hover {
   background-color: #e29b49;
   color: #fff;
+}
+
+/* Add styles for forms in table cells */
+td form {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+td form input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-size: 16px;
 }
 
 /* Стили для скрола */
