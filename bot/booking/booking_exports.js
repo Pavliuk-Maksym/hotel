@@ -4,13 +4,13 @@ import { setupMessengerScene } from "./messenger.js";
 import { howManyNight } from "./nights.js";
 import { checkData, details, paid } from "./payment.js";
 import { phone } from "./phone.js";
+import { pickHotel } from "./pickHotel.js";
 
 export {
+  pickHotel,
   pickDate,
-  // checkDate,
   fullName,
   setupMessengerScene,
-  // quantityNight,
   howManyNight,
   checkData,
   details,

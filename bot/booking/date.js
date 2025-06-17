@@ -1,4 +1,3 @@
-// date.js
 import { Markup, Scenes } from "telegraf";
 
 const pickDate = new Scenes.BaseScene("pickDate");

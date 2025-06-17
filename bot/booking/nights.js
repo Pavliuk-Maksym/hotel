@@ -1,12 +1,9 @@
-// night.js
 import { Scenes, Markup } from "telegraf";
 import Room from "../../modules/rooms.js";
 import Booking from "../../modules/booking.js";
 import Confirm from "../../modules/confirmBooking.js";
 
 const howManyNight = new Scenes.BaseScene("howManyNight");
-
-// utils/mergeIntervals.js
 
 function mergeIntervals(entries) {
   const intervals = entries.map((entry) => {
@@ -103,7 +100,7 @@ howManyNight.on("text", async (ctx) => {
     Markup.inlineKeyboard(buttons)
   );
 
-  return ctx.scene.enter("messenger");
+  return ctx.scene.enter("pickHotel");
 });
 
 export { howManyNight };

@@ -1,15 +1,13 @@
 import { Telegraf, Scenes, session } from "telegraf";
 
-// Импорт начального меню
 import start from "../bot/start.js";
 
-// Импорт сцен
 import checkScene from "../bot/check.js";
 import reservationScene from "../bot/reservation.js";
 import ageCheckScene from "../bot/age_check.js";
 
-// Импорт всех сцен, связанных с бронированием
 import {
+  pickHotel, // выбор города
   pickDate, // выбор даты
   // checkDate,       // проверка выбранной даты
   setupMessengerScene, // диалог через мессенджер
@@ -28,15 +26,13 @@ export async function launchBot() {
 
   const messengerScene = await setupMessengerScene(); // Получаем сцену диалога
 
-  // Регистрируем все сцены
   const stage = new Scenes.Stage([
+    pickHotel,
     checkScene,
     reservationScene,
     ageCheckScene,
     pickDate,
-    // checkDate,
     messengerScene,
-    // quantityNight,
     howManyNight,
     checkData,
     details,
@@ -58,10 +54,8 @@ export async function launchBot() {
   bot.launch(); // Запускаем бота
   console.log("🤖 Telegram bot started");
 
-  // Обработка завершения работы
   process.once("SIGINT", () => bot.stop("SIGINT"));
   process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
   return bot;
 }
-// das

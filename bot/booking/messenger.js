@@ -1,4 +1,3 @@
-// messenger.js
 import { Scenes, Markup } from "telegraf";
 import Room from "../../modules/rooms.js";
 
@@ -20,7 +19,7 @@ async function handleRoomAction(ctx, classRoom) {
   await ctx.replyWithHTML(room.description || "Опис відсутній");
 
   await ctx.reply(
-    "Виберіть Бронювати чи вернутись",
+    "Виберіть Бронювати чи Повернутись",
     Markup.keyboard([["Бронювати", "Назад"]])
       .oneTime()
       .resize()
@@ -28,24 +27,53 @@ async function handleRoomAction(ctx, classRoom) {
 }
 
 export async function setupMessengerScene() {
-  const roomTypes = await Room.distinct("classRoom");
   const messenger = new Scenes.BaseScene("messenger");
 
-  roomTypes.forEach((classRoom) => {
-    messenger.action(classRoom, (ctx) => handleRoomAction(ctx, classRoom));
-  });
+  // Сцена при входе — показываем доступные номера для выбранного города
+  messenger.enter(async (ctx) => {
+    const selectedCity = ctx.session.data?.hotelCity;
 
-  messenger.hears("Назад", async (ctx) => {
-    await ctx.reply(
-      "Введіть кількість ночей, які бажаєте провести в готелі (1-30)"
+    if (!selectedCity) {
+      await ctx.reply("Місто не вибрано. Повернення назад.");
+      return ctx.scene.enter("pickHotel");
+    }
+
+    // Получаем только номера в выбранном городе
+    const roomOptions = await Room.find({ hotelCity: selectedCity });
+
+    if (!roomOptions.length) {
+      await ctx.reply("На жаль, у цьому місті немає доступних номерів.");
+      return ctx.scene.enter("pickHotel");
+    }
+
+    // Создаем инлайн-кнопки для каждого типа номера
+    const buttons = roomOptions.map((room) =>
+      Markup.button.callback(room.classRoom, room.classRoom)
     );
-    await ctx.scene.enter("howManyNight");
+
+    await ctx.reply(
+      "Оберіть тип номеру:",
+      Markup.inlineKeyboard(buttons, { columns: 1 })
+    );
   });
 
+  // Обработка нажатий на типы номеров
+  messenger.action(/.*/, async (ctx) => {
+    const classRoom = ctx.match[0];
+    await handleRoomAction(ctx, classRoom);
+    await ctx.answerCbQuery();
+  });
+
+  // Назад → к выбору города
+  messenger.hears("Назад", async (ctx) => {
+    return ctx.scene.enter("pickHotel");
+  });
+
+  // Переход к следующему шагу
   messenger.hears("Бронювати", async (ctx) => {
     const { classRoom } = ctx.session.data;
     if (!classRoom) {
-      await ctx.reply("Будь ласка, спочатку виберіть номер.");
+      await ctx.reply("Будь ласка, спочатку виберіть тип номеру.");
       return;
     }
     return ctx.scene.enter("fullName");
