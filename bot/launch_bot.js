@@ -10,6 +10,7 @@ import ageCheckScene from "../bot/age_check.js";
 
 // Імпорт всіх сцен, пов'язаних з бронюванням
 import {
+  pickHotel, // вибір готелю
   pickDate, // вибір дати
   // checkDate,       // перевірка вибраної дати
   setupMessengerScene, // діалог через месенджер
