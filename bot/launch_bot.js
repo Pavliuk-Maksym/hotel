@@ -30,13 +30,12 @@ export async function launchBot() {
 
   // Реєструємо всі сцени
   const stage = new Scenes.Stage([
+    pickHotel,
     checkScene,
     reservationScene,
     ageCheckScene,
     pickDate,
-    // checkDate,
     messengerScene,
-    // quantityNight,
     howManyNight,
     checkData,
     details,
@@ -64,4 +63,3 @@ export async function launchBot() {
 
   return bot;
 }
-// das

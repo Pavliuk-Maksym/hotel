@@ -1,11 +1,20 @@
-// date.js
 import { Markup, Scenes } from "telegraf";
 
 const pickDate = new Scenes.BaseScene("pickDate");
 
 pickDate.enter(async (ctx) => {
   ctx.session.data = {};
-  await ctx.reply("Введіть дату в форматі ДД:ММ:РРРР (наприклад 13:06:2025)");
+
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString("uk-UA").replace(/\./g, ":");
+
+  await ctx.replyWithHTML(
+    `Введіть дату в форматі ДД:ММ:РРРР (наприклад <code>${formattedDate}</code>)`
+  );
+});
+
+pickDate.hears("Назад", async (ctx) => {
+  return ctx.scene.enter("ageCheck");
 });
 
 pickDate.on("text", async (ctx) => {
@@ -36,12 +45,12 @@ pickDate.on("text", async (ctx) => {
 
   ctx.session.data.date = inputDate;
   ctx.session.data.dateObj = inputDateObj;
-  await ctx.reply(
-    "Введіть кількість ночей, які бажаєте провести в готелі (1-30)",
-    Markup.keyboard([["Назад"]])
-      .resize()
-      .oneTime()
-  );
+  // await ctx.reply(
+  //   "Введіть кількість ночей, які бажаєте провести в готелі (1-30)",
+  //   Markup.keyboard([["Назад"]])
+  //     .resize()
+  //     .oneTime()
+  // );
   return ctx.scene.enter("howManyNight");
 });
 

@@ -3,8 +3,8 @@ import { Telegraf, Markup, Scenes } from "telegraf";
 const fullName = new Scenes.BaseScene("fullName");
 
 fullName.enter(async (ctx) => {
-  await ctx.reply(
-    "Введіть ваші ПІБ за зразком — Комаров Василій Дмитрович",
+  await ctx.replyWithHTML(
+    "Введіть ваші ПІБ за зразком — <code>Комаров Василій Дмитрович</code>",
     Markup.keyboard([["Назад"]])
       .resize()
       .oneTime()
@@ -12,7 +12,7 @@ fullName.enter(async (ctx) => {
 });
 
 fullName.hears("Назад", async (ctx) => {
-  await ctx.enter("messenger");
+  await ctx.scene.enter("messenger");
 });
 
 fullName.on("text", async (ctx) => {

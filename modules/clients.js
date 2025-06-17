@@ -15,6 +15,10 @@ const clientsSchema = new Schema({
     type: String,
     required: true,
   },
+  hotelCity: {
+    type: String,
+    required: true,
+  },
   classRoom: {
     type: String,
     required: true,

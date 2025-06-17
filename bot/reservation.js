@@ -14,23 +14,28 @@ reservation.hears("Відмінити бронь", async (ctx) => {
   if (confirms.length === 0) {
     await ctx.reply(
       "У вас немає активних броней для відміни.",
-      Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+      Markup.keyboard([["Назад в головне меню"]])
+        .oneTime()
+        .resize()
     );
     return;
   }
+
   for (const booking of confirms) {
     await ctx.replyWithHTML(
       `<b>Бронь №${booking._id}</b>\n` +
-      `<b>Дата бронювання:</b> ${booking.date}\n` +
-      `<b>Номер:</b> ${booking.classRoom}\n` +
-      `<b>ПБІ:</b> ${booking.fullName}\n` +
-      `<b>Телефон:</b> ${booking.phoneNumber}\n` +
-      `<b>ID для відміни:</b> <code>${booking._id}</code>`
+        `<b>Дата бронювання:</b> ${booking.date}\n` +
+        `<b>Номер:</b> ${booking.classRoom}\n` +
+        `<b>ПБІ:</b> ${booking.fullName}\n` +
+        `<b>Телефон:</b> ${booking.phoneNumber}\n` +
+        `<b>ID для відміни:</b> <code>${booking._id}</code>`
     );
   }
   await ctx.reply(
     "Правила відміни:\n- За 2 дні та більше до дати заїзду — повне повернення коштів.\n- Менше ніж за 2 дні — повернення 20% від вартості.\n\nВведіть номер (ID) вашої броні для відміни (скопіюйте з повідомлення вище):",
-    Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+    Markup.keyboard([["Назад в головне меню"]])
+      .oneTime()
+      .resize()
   );
   cancelState[ctx.from.id] = true;
 });
@@ -57,7 +62,9 @@ reservation.on("text", async (ctx) => {
     if (!/^[a-fA-F0-9]{24}$/.test(bookingId)) {
       await ctx.reply(
         "Помилка: введіть коректний номер (ID) броні, скопійований з повідомлення вище.",
-        Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+        Markup.keyboard([["Назад в головне меню"]])
+          .oneTime()
+          .resize()
       );
       return;
     }
@@ -65,16 +72,23 @@ reservation.on("text", async (ctx) => {
     if (!booking) {
       await ctx.reply(
         "Бронь з таким номером не знайдена. Перевірте номер і спробуйте знову.",
-        Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+        Markup.keyboard([["Назад в головне меню"]])
+          .oneTime()
+          .resize()
       );
       return;
     }
     // Перевіряємо, чи є вже заявка
-    const existing = await CancelRequest.findOne({ bookingId, status: "pending" });
+    const existing = await CancelRequest.findOne({
+      bookingId,
+      status: "pending",
+    });
     if (existing) {
       await ctx.reply(
         "Заявка на відміну цієї броні вже подана і знаходиться в обробці.",
-        Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+        Markup.keyboard([["Назад в головне меню"]])
+          .oneTime()
+          .resize()
       );
       return;
     }
@@ -93,7 +107,9 @@ reservation.on("text", async (ctx) => {
       }
     }
     if (!userId || !classRoom || !date || !price) {
-      await ctx.reply("Помилка: не вдалося визначити всі дані для заявки на відміну. Зверніться до адміністратора.");
+      await ctx.reply(
+        "Помилка: не вдалося визначити всі дані для заявки на відміну. Зверніться до адміністратора."
+      );
       cancelState[userIdFromCtx] = false;
       return;
     }
@@ -111,16 +127,19 @@ reservation.on("text", async (ctx) => {
       userName,
       fullName: booking.fullName,
       phoneNumber: booking.phoneNumber,
+      hotelCity: booking.hotelCity,
       classRoom,
       date,
       price,
       refundAmount,
       refundPercentage,
-      status: "pending"
+      status: "pending",
     });
     await ctx.reply(
       `Ваша заявка на відміну прийнята і буде розглянута адміністратором.\nУ разі схвалення повернення складе ${refundPercentage}% (${refundAmount} грн). Очікуйте повідомлення.`,
-      Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+      Markup.keyboard([["Назад в головне меню"]])
+        .oneTime()
+        .resize()
     );
     cancelState[userIdFromCtx] = false;
     return;
@@ -131,24 +150,27 @@ reservation.on("text", async (ctx) => {
   if (confirms.length === 0) {
     await ctx.reply(
       "Бронювання ще підтверджується або в вас немає бронювань",
-      Markup.keyboard([["Назад в головне меню"]]).oneTime().resize()
+      Markup.keyboard([["Назад в головне меню"]])
+        .oneTime()
+        .resize()
     );
     return;
   }
   for (const booking of confirms) {
     await ctx.replyWithHTML(
       `<b>Бронь №${booking._id}</b>\n` +
-      `<b>Дата бронювання:</b> ${booking.date}\n` +
-      `<b>Номер:</b> ${booking.classRoom}\n` +
-      `<b>ПБІ:</b> ${booking.fullName}\n` +
-      `<b>Телефон:</b> ${booking.phoneNumber}\n`
+        `<b>Дата бронювання:</b> ${booking.date}\n` +
+        `<b>Місто:</b> ${booking.hotelCity}\n` +
+        `<b>Номер:</b> ${booking.classRoom}\n` +
+        `<b>ПБІ:</b> ${booking.fullName}\n` +
+        `<b>Телефон:</b> ${booking.phoneNumber}\n`
     );
   }
   await ctx.reply(
     "Виберіть дію:",
-    Markup.keyboard([
-      ["Назад в головне меню", "Відмінити бронь"]
-    ]).oneTime().resize()
+    Markup.keyboard([["Назад в головне меню", "Відмінити бронь"]])
+      .oneTime()
+      .resize()
   );
 });
 

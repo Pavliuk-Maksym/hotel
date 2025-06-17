@@ -8,12 +8,14 @@ import Booking from "../../modules/booking.js";
 const checkData = new Scenes.BaseScene("checkData");
 
 checkData.enter(async (ctx) => {
-  const { date, classRoom, fullName, phoneNumber, night } = ctx.session.data;
+  const { date, classRoom, fullName, phoneNumber, night, hotelCity } =
+    ctx.session.data;
   const room = await Room.findOne({ classRoom });
   const price = room.price * night;
 
   await ctx.replyWithHTML(
-    `<b>📅 Дата:</b> ${date}
+    `<b>🏙️ Місто:</b> ${hotelCity}
+<b>📅 Дата:</b> ${date}
 <b>🏨 Номер:</b> ${classRoom}
 <b>👤 ПІБ:</b> ${fullName}
 <b>📞 Телефон:</b> ${phoneNumber}
@@ -55,7 +57,8 @@ details.action("Ні", async (ctx) => {
 const paid = new Scenes.BaseScene("paid");
 
 paid.hears("Сплачено", async (ctx) => {
-  const { date, night, classRoom, fullName, phoneNumber } = ctx.session.data;
+  const { date, night, classRoom, fullName, phoneNumber, hotelCity } =
+    ctx.session.data;
   const user = ctx.update.message.from;
   const userId = user.id;
   const userName = user.username || "unknown";
@@ -87,6 +90,7 @@ paid.hears("Сплачено", async (ctx) => {
     date,
     time,
     beforeDate,
+    hotelCity,
     classRoom,
     night,
     price,
