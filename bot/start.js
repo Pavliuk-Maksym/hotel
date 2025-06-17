@@ -1,8 +1,8 @@
 import { Telegraf, Markup } from "telegraf";
 
-// Функция, которая запускается при старте бота
+// Функція, яка запускається при старті бота
 async function start(ctx) {
-  // Переходим в сцену проверки возраста
+  // Переходимо в сцену перевірки віку
   await ctx.scene.enter("ageCheck");
 }
 

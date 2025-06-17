@@ -1,27 +1,27 @@
 import { Scenes, Markup } from "telegraf";
 
-// Создаем сцену проверки возраста
+// Створюємо сцену перевірки віку
 const ageCheckScene = new Scenes.BaseScene("ageCheck");
 
-// Обработчик входа в сцену
+// Обробник входу в сцену
 ageCheckScene.enter(async (ctx) => {
   await ctx.reply(
-    "Для использования бота необходимо подтвердить, что вам исполнилось 18 лет. Вы подтверждаете?",
+    "Для використання бота необхідно підтвердити, що вам виповнилося 18 років. Ви підтверджуєте?",
     Markup.inlineKeyboard([
       [
-        Markup.button.callback("Да, мне 18 или больше", "age_confirm_yes"),
-        Markup.button.callback("Нет, мне меньше 18", "age_confirm_no"),
+        Markup.button.callback("Так, мені 18 або більше", "age_confirm_yes"),
+        Markup.button.callback("Ні, мені менше 18", "age_confirm_no"),
       ],
     ])
   );
 });
 
-// Обработчик нажатия кнопки "Да"
+// Обробник натискання кнопки "Так"
 ageCheckScene.action("age_confirm_yes", async (ctx) => {
-  await ctx.deleteMessage(); // Удаляем сообщение с кнопками
-  await ctx.reply("Спасибо за подтверждение! Добро пожаловать в меню бота.");
+  await ctx.deleteMessage(); // Видаляємо повідомлення з кнопками
+  await ctx.reply("Дякуємо за підтвердження! Ласкаво просимо в меню бота.");
   await ctx.scene.leave();
-  // Показываем основное меню
+  // Показуємо основне меню
   await ctx.reply(
     "Виберіть, що вас цікавить",
     Markup.keyboard([["Ввести дату"], ["Порядок заселення", "Ваші бронювання"]])
@@ -30,10 +30,10 @@ ageCheckScene.action("age_confirm_yes", async (ctx) => {
   );
 });
 
-// Обработчик нажатия кнопки "Нет"
+// Обробник натискання кнопки "Ні"
 ageCheckScene.action("age_confirm_no", async (ctx) => {
-  await ctx.deleteMessage(); // Удаляем сообщение с кнопками
-  await ctx.reply("К сожалению, вы не можете использовать бота, так как вам меньше 18 лет.");
+  await ctx.deleteMessage(); // Видаляємо повідомлення з кнопками
+  await ctx.reply("На жаль, ви не можете використовувати бота, оскільки вам менше 18 років.");
   await ctx.scene.leave();
 });
 
