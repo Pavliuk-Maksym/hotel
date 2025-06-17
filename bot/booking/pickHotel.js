@@ -17,9 +17,9 @@ pickHotel.enter(async (ctx) => {
 });
 
 pickHotel.hears("Назад", async (ctx) => {
-  await ctx.reply(
-    "Введіть кількість ночей, які бажаєте провести в готелі (1-30)"
-  );
+  // await ctx.reply(
+  //   "Введіть кількість ночей, які бажаєте провести в готелі (1-30)"
+  // );
   return ctx.scene.enter("howManyNight"); // заміни на актуальну назву попередньої сцени
 });
 

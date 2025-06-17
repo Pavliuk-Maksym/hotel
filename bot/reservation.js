@@ -20,11 +20,12 @@ reservation.hears("Отменить бронь", async (ctx) => {
     );
     return;
   }
+
   for (const booking of confirms) {
     await ctx.replyWithHTML(
       `<b>Бронь №${booking._id}</b>\n` +
         `<b>Дата бронювання:</b> ${booking.date}\n` +
-        `<b>Місто:</b> ${booking.hotelCity}` +
+        `<b>Місто:</b> ${booking.hotelCity}\n` +
         `<b>Номер:</b> ${booking.classRoom}\n` +
         `<b>ПБІ:</b> ${booking.fullName}\n` +
         `<b>Телефон:</b> ${booking.phoneNumber}\n` +

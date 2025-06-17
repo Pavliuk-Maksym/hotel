@@ -23,7 +23,7 @@ export function launchAdminPanel(bot) {
   // Set views directory
   app.set("views", path.join(projectRoot, "views"));
   app.set("view engine", "ejs");
-  
+
   // Serve static files
   app.use(express.static(path.join(projectRoot, "views")));
   app.use("/img", express.static(path.join(projectRoot, "img")));
@@ -31,7 +31,7 @@ export function launchAdminPanel(bot) {
 
   // Debug middleware to log static file requests
   app.use((req, res, next) => {
-    console.log('Request URL:', req.url);
+    console.log("Request URL:", req.url);
     next();
   });
 
@@ -151,7 +151,11 @@ export function launchAdminPanel(bot) {
   app.post("/declineBooking", async (req, res) => {
     const { userName, fullName, classRoom, adminComment } = req.body;
     if (!userName || !fullName || !classRoom || !adminComment) {
-      return res.status(400).send("Не переданы все необходимые поля (userName, fullName, classRoom, adminComment)");
+      return res
+        .status(400)
+        .send(
+          "Не переданы все необходимые поля (userName, fullName, classRoom, adminComment)"
+        );
     }
     const booking = await Booking.findOne({ userName, fullName, classRoom });
     if (!booking) {
@@ -169,22 +173,68 @@ export function launchAdminPanel(bot) {
         console.error("Ошибка отправки уведомления об отказе:", e);
       }
     }
-    console.log("Отклонена бронь: userName=" + userName + ", fullName=" + fullName + ", classRoom=" + classRoom + ", причина: " + adminComment);
+    console.log(
+      "Отклонена бронь: userName=" +
+        userName +
+        ", fullName=" +
+        fullName +
+        ", classRoom=" +
+        classRoom +
+        ", причина: " +
+        adminComment
+    );
     res.redirect("/confirmPayment");
   });
 
   app.post("/confirmBooking", async (req, res) => {
-    const { userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName } = req.body;
-    if (!userName || !date || !time || !beforeDate || !classRoom || !night || !price || !phoneNumber || !fullName) {
-      return res.status(400).send("Не переданы все необходимые поля (userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName)");
+    const {
+      userName,
+      date,
+      time,
+      beforeDate,
+      classRoom,
+      night,
+      price,
+      phoneNumber,
+      fullName,
+    } = req.body;
+    if (
+      !userName ||
+      !date ||
+      !time ||
+      !beforeDate ||
+      !classRoom ||
+      !night ||
+      !price ||
+      !phoneNumber ||
+      !fullName
+    ) {
+      return res
+        .status(400)
+        .send(
+          "Не переданы все необходимые поля (userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName)"
+        );
     }
     const booking = await Booking.findOne({ userName, fullName, classRoom });
     if (!booking) {
       return res.status(404).send("Бронь не найдена.");
     }
     await Booking.deleteOne({ _id: booking._id });
-    const confirm = new Confirm({ userName, userId: booking.userId, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName });
+    const confirm = new Confirm({
+      userName,
+      userId: booking.userId,
+      date,
+      time,
+      beforeDate,
+      hotelCity: booking.hotelCity,
+      classRoom,
+      night,
+      price,
+      phoneNumber,
+      fullName,
+    });
     await confirm.save();
+
     // Отправляем уведомление пользователю в Telegram
     if (booking.userId && bot && bot.telegram) {
       try {
@@ -196,18 +246,31 @@ export function launchAdminPanel(bot) {
         console.error("Ошибка отправки уведомления о подтверждении:", e);
       }
     }
-    console.log("Подтверждена бронь: userName=" + userName + ", fullName=" + fullName + ", classRoom=" + classRoom + ", номер брони: " + confirm._id);
+    console.log(
+      "Подтверждена бронь: userName=" +
+        userName +
+        ", fullName=" +
+        fullName +
+        ", classRoom=" +
+        classRoom +
+        ", номер брони: " +
+        confirm._id
+    );
     res.redirect("/confirmPayment");
   });
 
   // Страница заявок на отмену
   app.get("/cancelRequests", async (req, res) => {
-    const requests = await CancelRequest.find({ status: "pending" }).sort({ createdAt: 1 });
+    const requests = await CancelRequest.find({ status: "pending" }).sort({
+      createdAt: 1,
+    });
     res.render("cancelRequests/cancel", { requests });
   });
 
   app.post("/cancelRequests", async (req, res) => {
-    const requests = await CancelRequest.find({ status: "pending" }).sort({ createdAt: 1 });
+    const requests = await CancelRequest.find({ status: "pending" }).sort({
+      createdAt: 1,
+    });
     res.render("cancelRequests/cancel", { requests });
   });
 
@@ -227,7 +290,9 @@ export function launchAdminPanel(bot) {
           request.userId,
           `Ваша заявка на отмену подтверждена!\nСумма возврата: ${request.refundAmount} грн (${request.refundPercentage}%)`
         );
-      } catch (e) { console.error("Ошибка отправки уведомления об отмене:", e); }
+      } catch (e) {
+        console.error("Ошибка отправки уведомления об отмене:", e);
+      }
     }
     res.redirect("/cancelRequests");
   });
@@ -247,7 +312,9 @@ export function launchAdminPanel(bot) {
           request.userId,
           `Ваша заявка на отмену отклонена. Причина: ${adminComment}`
         );
-      } catch (e) { console.error("Ошибка отправки уведомления об отказе отмены:", e); }
+      } catch (e) {
+        console.error("Ошибка отправки уведомления об отказе отмены:", e);
+      }
     }
     res.redirect("/cancelRequests");
   });
