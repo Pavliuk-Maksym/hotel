@@ -28,7 +28,10 @@ phone.on("text", async (ctx) => {
   // Якщо номер введено неправильно — виводимо повідомлення про помилку
   if (!regex.test(input)) {
     await ctx.reply(
-      "❌ Неправильний формат. Приклад: +380937465892. Спробуйте ще раз."
+      "❌ Неправильний формат номера телефону. Приклад: +380937465892. Спробуйте ще раз.",
+      Markup.keyboard([["Назад"]])
+        .resize()
+        .oneTime()
     );
     return;
   }
@@ -40,6 +43,11 @@ phone.on("text", async (ctx) => {
   );
 
   ctx.session.data.phoneNumber = formatted; // Зберігаємо в сесію
+
+  await ctx.reply(
+    "✅ Номер телефону успішно введений!",
+    Markup.removeKeyboard()
+  );
 
   return ctx.scene.enter("checkData"); // Перехід до наступної сцени — перевірка даних
 });

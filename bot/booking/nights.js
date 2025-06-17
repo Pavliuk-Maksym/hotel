@@ -16,15 +16,37 @@ howManyNight.hears("Назад", async (ctx) => {
 });
 
 howManyNight.on("text", async (ctx) => {
-  const nights = parseInt(ctx.message.text.trim());
-  if (isNaN(nights) || nights < 1 || nights > 30) {
-    await ctx.reply("Будь ласка, введіть число від 1 до 30.");
+  const input = ctx.message.text.trim();
+  const nights = parseInt(input);
+  
+  if (isNaN(nights)) {
+    await ctx.reply(
+      "❌ Помилка: Введіть число від 1 до 30. Спробуйте ще раз.",
+      Markup.keyboard([["Назад"]])
+        .resize()
+        .oneTime()
+    );
+    return;
+  }
+  
+  if (nights < 1 || nights > 30) {
+    await ctx.reply(
+      "❌ Помилка: Кількість ночей має бути від 1 до 30. Спробуйте ще раз.",
+      Markup.keyboard([["Назад"]])
+        .resize()
+        .oneTime()
+    );
     return;
   }
 
   ctx.session.data = ctx.session.data || {};
   ctx.session.data.night = nights;
 
+  await ctx.reply(
+    "✅ Кількість ночей успішно введена!",
+    Markup.removeKeyboard()
+  );
+  
   await ctx.reply("Тепер виберіть місто, в якому бажаєте зупинитись.");
   return ctx.scene.enter("pickHotel");
 });

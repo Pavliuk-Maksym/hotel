@@ -1,0 +1,54 @@
+[
+    {
+      "hotelCity": "Киев",
+      "classRoom": "econom",
+      "price": 1500,
+      "quantity": 10,
+      "image": [
+        "img/econom/kyiv-econom-double-01-1-635x357.jpg",
+        "img/econom/kyiv-econom-double-02-1-635x357.jpg",
+        "img/econom/kyiv-econom-double-03-635x357.jpg",
+        "img/econom/kyiv-econom-double-04-635x357.jpg"
+      ],
+      "description": "Уютные экономичные номера с базовыми удобствами"
+    },
+    {
+      "hotelCity": "Киев",
+      "classRoom": "standart",
+      "price": 2500,
+      "quantity": 8,
+      "image": [
+        "img/standart/kyiv-standard-double-tworoom-01-1-635x357.jpg",
+        "img/standart/kyiv-standard-double-tworoom-02-1-635x357.jpg",
+        "img/standart/kyiv-standard-double-tworoom-03-635x357.jpg",
+        "img/standart/kyiv-standard-double-tworoom-05-635x357.jpg"
+      ],
+      "description": "Стандартные номера с улучшенным комфортом"
+    },
+    {
+      "hotelCity": "Киев",
+      "classRoom": "napivLuxury",
+      "price": 3500,
+      "quantity": 5,
+      "image": [
+        "img/napivLuxury/kyiv-juniorsuite-single-oneroom-04-635x357.jpg",
+        "img/napivLuxury/kyiv-juniorsuite-single-oneroom-07-635x357.jpg",
+        "img/napivLuxury/kyiv-juniorsuite-single-oneroom-09-635x357.jpg",
+        "img/napivLuxury/kyiv-juniorsuite-single-oneroom-10-1-635x357.jpg"
+      ],
+      "description": "Полулюкс номера с премиальным обслуживанием"
+    },
+    {
+      "hotelCity": "Киев",
+      "classRoom": "luxury",
+      "price": 5000,
+      "quantity": 3,
+      "image": [
+        "img/luxury/kyiv-classic-03-635x357.jpg",
+        "img/luxury/kyiv-classic-04-635x357.jpg",
+        "img/luxury/kyiv-classic-06-635x357.jpg",
+        "img/luxury/kyiv-classic-07-635x357.jpg"
+      ],
+      "description": "Люкс номера с максимальным комфортом и сервисом"
+    }
+  ]

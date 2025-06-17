@@ -1,0 +1,67 @@
+[
+  {
+    "userName": "ivan_petrov",
+    "userId": "user_001",
+    "date": "2024-01-15",
+    "time": "14:30",
+    "beforeDate": "2024-01-20",
+    "hotelCity": "Киев",
+    "classRoom": "standart",
+    "night": 5,
+    "price": 12500,
+    "phoneNumber": "+380501234567",
+    "fullName": "Иван Петров"
+  },
+  {
+    "userName": "maria_ivanova",
+    "userId": "user_002",
+    "date": "2024-01-18",
+    "time": "16:00",
+    "beforeDate": "2024-01-22",
+    "hotelCity": "Киев",
+    "classRoom": "econom",
+    "night": 4,
+    "price": 6000,
+    "phoneNumber": "+380671234567",
+    "fullName": "Мария Иванова"
+  },
+  {
+    "userName": "oleksandr_sydorenko",
+    "userId": "user_003",
+    "date": "2024-01-20",
+    "time": "12:00",
+    "beforeDate": "2024-01-25",
+    "hotelCity": "Киев",
+    "classRoom": "luxury",
+    "night": 5,
+    "price": 25000,
+    "phoneNumber": "+380631234567",
+    "fullName": "Олександр Сидоренко"
+  },
+  {
+    "userName": "anna_kovalenko",
+    "userId": "user_004",
+    "date": "2024-01-22",
+    "time": "18:30",
+    "beforeDate": "2024-01-26",
+    "hotelCity": "Киев",
+    "classRoom": "napivLuxury",
+    "night": 4,
+    "price": 14000,
+    "phoneNumber": "+380661234567",
+    "fullName": "Анна Коваленко"
+  },
+  {
+    "userName": "vitaliy_melnyk",
+    "userId": "user_005",
+    "date": "2024-01-25",
+    "time": "10:00",
+    "beforeDate": "2024-01-30",
+    "hotelCity": "Киев",
+    "classRoom": "standart",
+    "night": 5,
+    "price": 12500,
+    "phoneNumber": "+380681234567",
+    "fullName": "Віталій Мельник"
+  }
+] 

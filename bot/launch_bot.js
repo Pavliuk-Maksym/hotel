@@ -53,7 +53,7 @@ export async function launchBot() {
   bot.hears("Порядок заселення", (ctx) => ctx.scene.enter("checkWizard"));
   bot.hears("Ваші бронювання", (ctx) => ctx.scene.enter("reservationWizard"));
 
-  bot.use(start); // Показуємо стартове меню при першому запуску
+  bot.start(start); // Показываем сцену ageCheck только при /start
 
   bot.launch(); // Запускаємо бота
   console.log("🤖 Telegram bot started");

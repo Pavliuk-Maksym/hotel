@@ -1,0 +1,37 @@
+[
+  {
+    "userName": "ivan_petrov",
+    "fullName": "Иван Петров",
+    "phoneNumber": "+380501234567",
+    "hotelCity": "Киев",
+    "classRoom": "standart"
+  },
+  {
+    "userName": "maria_ivanova",
+    "fullName": "Мария Иванова",
+    "phoneNumber": "+380671234567",
+    "hotelCity": "Киев",
+    "classRoom": "econom"
+  },
+  {
+    "userName": "oleksandr_sydorenko",
+    "fullName": "Олександр Сидоренко",
+    "phoneNumber": "+380631234567",
+    "hotelCity": "Киев",
+    "classRoom": "luxury"
+  },
+  {
+    "userName": "anna_kovalenko",
+    "fullName": "Анна Коваленко",
+    "phoneNumber": "+380661234567",
+    "hotelCity": "Киев",
+    "classRoom": "napivLuxury"
+  },
+  {
+    "userName": "vitaliy_melnyk",
+    "fullName": "Віталій Мельник",
+    "phoneNumber": "+380681234567",
+    "hotelCity": "Киев",
+    "classRoom": "standart"
+  }
+] 
