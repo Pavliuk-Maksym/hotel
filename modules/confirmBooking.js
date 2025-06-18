@@ -14,6 +14,7 @@ const confirmSchema = new Schema({
   date: String,
   time: String,
   beforeDate: String,
+  hotelCity: String,
   classRoom: String,
   night: Number,
   price: Number,

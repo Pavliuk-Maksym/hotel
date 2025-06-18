@@ -23,7 +23,7 @@ export function launchAdminPanel(bot) {
   // Set views directory
   app.set("views", path.join(projectRoot, "views"));
   app.set("view engine", "ejs");
-  
+
   // Serve static files
   app.use(express.static(path.join(projectRoot, "views")));
   app.use("/img", express.static(path.join(projectRoot, "img")));
@@ -31,7 +31,7 @@ export function launchAdminPanel(bot) {
 
   // Debug middleware to log static file requests
   app.use((req, res, next) => {
-    console.log('Request URL:', req.url);
+    console.log("Request URL:", req.url);
     next();
   });
 
@@ -151,103 +151,169 @@ export function launchAdminPanel(bot) {
   app.post("/declineBooking", async (req, res) => {
     const { userName, fullName, classRoom, adminComment } = req.body;
     if (!userName || !fullName || !classRoom || !adminComment) {
-      return res.status(400).send("Не переданы все необходимые поля (userName, fullName, classRoom, adminComment)");
+      return res
+        .status(400)
+        .send(
+          "Не передано всі необхідні поля (userName, fullName, classRoom, adminComment)"
+        );
     }
     const booking = await Booking.findOne({ userName, fullName, classRoom });
     if (!booking) {
-      return res.status(404).send("Бронь не найдена.");
+      return res.status(404).send("Бронювання не знайдено.");
     }
     await Booking.deleteOne({ _id: booking._id });
-    // Отправляем уведомление пользователю в Telegram
+    // Відправляємо повідомлення користувачу в Telegram
     if (booking.userId && bot && bot.telegram) {
       try {
         await bot.telegram.sendMessage(
           booking.userId,
-          `Ваша бронь отклонена.\nПричина: ${adminComment}`
+          `Ваше бронювання відхилено.\nПричина: ${adminComment}`
         );
       } catch (e) {
-        console.error("Ошибка отправки уведомления об отказе:", e);
+        console.error("Помилка відправки повідомлення про відхилення:", e);
       }
     }
-    console.log("Отклонена бронь: userName=" + userName + ", fullName=" + fullName + ", classRoom=" + classRoom + ", причина: " + adminComment);
+    console.log(
+      "Відхилено бронювання: userName=" +
+        userName +
+        ", fullName=" +
+        fullName +
+        ", classRoom=" +
+        classRoom +
+        ", причина: " +
+        adminComment
+    );
     res.redirect("/confirmPayment");
   });
 
   app.post("/confirmBooking", async (req, res) => {
-    const { userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName } = req.body;
-    if (!userName || !date || !time || !beforeDate || !classRoom || !night || !price || !phoneNumber || !fullName) {
-      return res.status(400).send("Не переданы все необходимые поля (userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName)");
+    const {
+      userName,
+      date,
+      time,
+      beforeDate,
+      classRoom,
+      night,
+      price,
+      phoneNumber,
+      fullName,
+    } = req.body;
+    if (
+      !userName ||
+      !date ||
+      !time ||
+      !beforeDate ||
+      !classRoom ||
+      !night ||
+      !price ||
+      !phoneNumber ||
+      !fullName
+    ) {
+      return res
+        .status(400)
+        .send(
+          "Не передані всі необхідні поля (userName, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName)"
+        );
     }
     const booking = await Booking.findOne({ userName, fullName, classRoom });
     if (!booking) {
-      return res.status(404).send("Бронь не найдена.");
+      return res.status(404).send("Бронь не знайдена.");
     }
     await Booking.deleteOne({ _id: booking._id });
-    const confirm = new Confirm({ userName, userId: booking.userId, date, time, beforeDate, classRoom, night, price, phoneNumber, fullName });
+    const confirm = new Confirm({
+      userName,
+      userId: booking.userId,
+      date,
+      time,
+      beforeDate,
+      hotelCity: booking.hotelCity,
+      classRoom,
+      night,
+      price,
+      phoneNumber,
+      fullName,
+    });
     await confirm.save();
-    // Отправляем уведомление пользователю в Telegram
+    // Відправляємо повідомлення користувачу в Telegram
     if (booking.userId && bot && bot.telegram) {
       try {
         await bot.telegram.sendMessage(
           booking.userId,
-          `Ваша бронь подтверждена!\nНомер: ${classRoom}\nДата: ${date}\nПІБ: ${fullName}`
+          `Ваша бронь підтверджена!\nНомер: ${classRoom}\nДата: ${date}\nПІБ: ${fullName}`
         );
       } catch (e) {
-        console.error("Ошибка отправки уведомления о подтверждении:", e);
+        console.error("Помилка відправки повідомлення про підтвердження:", e);
       }
     }
-    console.log("Подтверждена бронь: userName=" + userName + ", fullName=" + fullName + ", classRoom=" + classRoom + ", номер брони: " + confirm._id);
+    console.log(
+      "Підтверджено бронювання: userName=" +
+        userName +
+        ", fullName=" +
+        fullName +
+        ", classRoom=" +
+        classRoom +
+        ", номер броні: " +
+        confirm._id
+    );
     res.redirect("/confirmPayment");
   });
 
-  // Страница заявок на отмену
+  // Страница заявок на відмову
   app.get("/cancelRequests", async (req, res) => {
-    const requests = await CancelRequest.find({ status: "pending" }).sort({ createdAt: 1 });
+    const requests = await CancelRequest.find({ status: "pending" }).sort({
+      createdAt: 1,
+    });
     res.render("cancelRequests/cancel", { requests });
   });
 
   app.post("/cancelRequests", async (req, res) => {
-    const requests = await CancelRequest.find({ status: "pending" }).sort({ createdAt: 1 });
+    const requests = await CancelRequest.find({ status: "pending" }).sort({
+      createdAt: 1,
+    });
     res.render("cancelRequests/cancel", { requests });
   });
 
-  // Подтвердить отмену
+  // Підтвердити відмову
   app.post("/confirmCancel", async (req, res) => {
     const { requestId } = req.body;
     const request = await CancelRequest.findById(requestId);
-    if (!request) return res.status(404).send("Заявка не найдена");
+    if (!request) return res.status(404).send("Заявка не знайдена");
     request.status = "confirmed";
     await request.save();
-    // Удаляем бронь из Confirm
+    // Видаляємо бронь з Confirm
     await Confirm.deleteOne({ _id: request.bookingId });
-    // Уведомляем пользователя
+    // Відправляємо повідомлення користувачу
     if (request.userId && bot && bot.telegram) {
       try {
         await bot.telegram.sendMessage(
           request.userId,
-          `Ваша заявка на отмену подтверждена!\nСумма возврата: ${request.refundAmount} грн (${request.refundPercentage}%)`
+          `Ваша заявка на відмову підтверджена!\nСума повернення: ${request.refundAmount} грн (${request.refundPercentage}%)`
         );
-      } catch (e) { console.error("Ошибка отправки уведомления об отмене:", e); }
+      } catch (e) {
+        console.error("Помилка відправки повідомлення про відмову:", e);
+      }
     }
     res.redirect("/cancelRequests");
   });
 
-  // Отклонить отмену
+  // Відхилити відмову
   app.post("/declineCancel", async (req, res) => {
     const { requestId, adminComment } = req.body;
     const request = await CancelRequest.findById(requestId);
-    if (!request) return res.status(404).send("Заявка не найдена");
+    if (!request) return res.status(404).send("Заявка не знайдена");
     request.status = "declined";
     request.adminComment = adminComment;
     await request.save();
-    // Уведомляем пользователя
+    // Відправляємо повідомлення користувачу
     if (request.userId && bot && bot.telegram) {
       try {
         await bot.telegram.sendMessage(
           request.userId,
-          `Ваша заявка на отмену отклонена. Причина: ${adminComment}`
+          `Ваша заявка на відмову відхилена. Причина: ${adminComment}`
         );
-      } catch (e) { console.error("Ошибка отправки уведомления об отказе отмены:", e); }
+      } catch (e) {
+        console.error("Помилка відправки повідомлення про відмову:", e);
+      }
     }
     res.redirect("/cancelRequests");
   });

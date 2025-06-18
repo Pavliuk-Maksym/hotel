@@ -8,6 +8,7 @@ const cancelRequestSchema = new Schema({
   userName: { type: String, required: true },
   fullName: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  hotelCity: { type: String, required: true },
   classRoom: { type: String, required: true },
   date: { type: String, required: true },
   price: { type: Number, required: true },
