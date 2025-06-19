@@ -1,4 +1,5 @@
 import { Telegraf, Markup, Scenes } from "telegraf";
+import { isValidFullName } from "./validation.js";
 
 const fullName = new Scenes.BaseScene("fullName");
 
@@ -29,12 +30,10 @@ fullName.on("text", async (ctx) => {
     return;
   }
   
-  // Требует три слова, каждое с большой буквы и не короче 2 букв
-  const regex = /^([А-ЯІЇЄЁ][а-яіїєё']{1,}\s){2}[А-ЯІЇЄЁ][а-яіїєё']{1,}$/u;
-
-  if (!regex.test(input)) {
+  // Проверяем через централизованную функцию
+  if (!isValidFullName(input)) {
     await ctx.reply(
-      "❌ Неправильний формат ПІБ. Введіть три слова, кожне з великої літери. Наприклад: Комаров Василь Дмитрович. Спробуйте ще раз.",
+      "❌ Неправильний формат ПІБ. Введіть три слова, кожне з великої літери українською. Наприклад: Комаров Василь Дмитрович. Спробуйте ще раз.",
       Markup.keyboard([["Назад"]])
         .resize()
         .oneTime()

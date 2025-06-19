@@ -17,7 +17,11 @@ function isValidDate(str) {
 // Валидация ФИО (три слова, каждое с большой буквы, не короче 2 букв)
 function isValidFullName(str) {
   if (!str || str.length < 5) return false;
-  const regex = /^([А-ЯІЇЄЁ][а-яіїєё']{1,}\s){2}[А-ЯІЇЄЁ][а-яіїєё']{1,}$/u;
+  // Только украинские буквы, три слова, каждое с большой буквы, не короче 2 букв
+  // Исключаем русские буквы (ЫыЭэЁё)
+  const forbidden = /[ЫыЭэЁё]/;
+  if (forbidden.test(str)) return false;
+  const regex = /^([А-ЯІЇЄҐ][а-яіїєґʼ]{1,}\s){2}[А-ЯІЇЄҐ][а-яіїєґʼ]{1,}$/u;
   return regex.test(str);
 }
 
@@ -33,4 +37,4 @@ function isValidNights(str) {
   return !isNaN(n) && n >= 1 && n <= 30;
 }
 
-module.exports = { isValidDate, isValidFullName, isValidPhone, isValidNights }; 
+export { isValidDate, isValidFullName, isValidPhone, isValidNights }; 
