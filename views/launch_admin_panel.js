@@ -102,7 +102,15 @@ export function launchAdminPanel(bot) {
       const { username, password } = req.body;
       const user = await Admin.findOne({ username, password });
       if (user) {
-        const client = await Confirm.find().sort({ date: 1 });
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const client = (await Confirm.find().sort({ date: 1 })).filter(book => {
+          if (!book.date) return false;
+          const [d, m, y] = book.date.split(":").map(Number);
+          const bookingDate = new Date(y, m - 1, d);
+          bookingDate.setHours(0,0,0,0);
+          return bookingDate >= today;
+        });
         res.render("activeBooking/active", { client });
       } else {
         res.redirect("/");
@@ -114,13 +122,29 @@ export function launchAdminPanel(bot) {
   });
 
   app.get("/confirmPayment", async (req, res) => {
-    const bookings = await Booking.find({}).sort({ date: 1 });
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const bookings = (await Booking.find({}).sort({ date: 1 })).filter(book => {
+      if (!book.date) return false;
+      const [d, m, y] = book.date.split(":").map(Number);
+      const bookingDate = new Date(y, m - 1, d);
+      bookingDate.setHours(0,0,0,0);
+      return bookingDate >= today;
+    });
     res.render("confirmPayment/confirm", { bookings });
   });
 
   app.post("/confirmPayment", async (req, res) => {
     try {
-      const bookings = await Booking.find();
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const bookings = (await Booking.find()).filter(book => {
+        if (!book.date) return false;
+        const [d, m, y] = book.date.split(":").map(Number);
+        const bookingDate = new Date(y, m - 1, d);
+        bookingDate.setHours(0,0,0,0);
+        return bookingDate >= today;
+      });
       res.render("confirmPayment/confirm", { bookings });
     } catch (err) {
       console.error(err);
@@ -130,7 +154,15 @@ export function launchAdminPanel(bot) {
 
   app.post("/activeBooking", async (req, res) => {
     try {
-      const client = await Confirm.find().sort({ date: 1 });
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const client = (await Confirm.find().sort({ date: 1 })).filter(book => {
+        if (!book.date) return false;
+        const [d, m, y] = book.date.split(":").map(Number);
+        const bookingDate = new Date(y, m - 1, d);
+        bookingDate.setHours(0,0,0,0);
+        return bookingDate >= today;
+      });
       res.render("activeBooking/active", { client });
     } catch (err) {
       console.error(err);
@@ -140,7 +172,15 @@ export function launchAdminPanel(bot) {
 
   app.get("/activeBooking", async (req, res) => {
     try {
-      const client = await Confirm.find().sort({ date: 1 });
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const client = (await Confirm.find().sort({ date: 1 })).filter(book => {
+        if (!book.date) return false;
+        const [d, m, y] = book.date.split(":").map(Number);
+        const bookingDate = new Date(y, m - 1, d);
+        bookingDate.setHours(0,0,0,0);
+        return bookingDate >= today;
+      });
       res.render("activeBooking/active", { client });
     } catch (err) {
       console.error(err);

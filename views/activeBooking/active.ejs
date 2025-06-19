@@ -32,8 +32,14 @@
           </tr>
         </thead>
         <tbody>
-          <% let count = 1; %> <% if (client && client.length > 0) { %> <%
-          client.forEach(function(book) { %>
+          <% let count = 1; const today = new Date(); today.setHours(0,0,0,0); %> <% if (client && client.length > 0) { %> <%
+          client.filter(function(book) {
+            if (!book.date) return false;
+            const [d, m, y] = book.date.split(":").map(Number);
+            const bookingDate = new Date(y, m - 1, d);
+            bookingDate.setHours(0,0,0,0);
+            return bookingDate >= today;
+          }).forEach(function(book) { %>
           <tr>
             <td><%= count %></td>
             <td><%= book.fullName %></td>

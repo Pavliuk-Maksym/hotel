@@ -10,7 +10,15 @@ let cancelState = {};
 // Обробник кнопки "Відмінити бронь"
 reservation.hears("Відмінити бронь", async (ctx) => {
   const userName = ctx.update.message.from.username;
-  const confirms = await Confirm.find({ userName });
+  const confirms = (await Confirm.find({ userName })).filter(booking => {
+    if (!booking.date) return false;
+    const [d, m, y] = booking.date.split(":").map(Number);
+    const bookingDate = new Date(y, m - 1, d);
+    bookingDate.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return bookingDate >= today;
+  });
   if (confirms.length === 0) {
     await ctx.reply(
       "У вас немає активних броней для відміни.",
@@ -146,7 +154,15 @@ reservation.on("text", async (ctx) => {
   }
 
   // Звичайний сценарій: виводимо список броней
-  const confirms = await Confirm.find({ userName });
+  const confirms = (await Confirm.find({ userName })).filter(booking => {
+    if (!booking.date) return false;
+    const [d, m, y] = booking.date.split(":").map(Number);
+    const bookingDate = new Date(y, m - 1, d);
+    bookingDate.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return bookingDate >= today;
+  });
   if (confirms.length === 0) {
     await ctx.reply(
       "Бронювання ще підтверджується або в вас немає бронювань",
