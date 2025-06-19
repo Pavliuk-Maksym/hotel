@@ -1,34 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
   <head>
     <meta charset="UTF-8" />
-    <title>Active Bookings</title>
+    <title>Активні бронювання</title>
     <link rel="stylesheet" type="text/css" href="/css/active.css" />
   </head>
   <body>
     <nav>
       <form action="/activeBooking" method="POST">
-        <button type="submit" class="nav-item active">Active booking</button>
+        <button type="submit" class="nav-item active">Активні бронювання</button>
       </form>
       <form action="/confirmPayment" method="POST">
-        <button type="submit" class="nav-item">Confirm of payment</button>
+        <button type="submit" class="nav-item">Підтвердження оплати</button>
       </form>
       <form action="/cancelRequests" method="POST">
-        <button type="submit" class="nav-item">Cancel requests</button>
+        <button type="submit" class="nav-item">Запити на скасування</button>
       </form>
     </nav>
     <div class="container">
-      <h1>Активные (подтверждённые) бронирования</h1>
+      <h1>Активні (підтверджені) бронювання</h1>
       <table>
         <thead>
           <tr>
             <th>#</th>
-            <th>Клиент</th>
+            <th>Клієнт</th>
             <th>Телефон</th>
             <th>Дата</th>
             <th>Номер</th>
             <th>Ночей</th>
-            <th>Стоимость</th>
+            <th>Вартість</th>
           </tr>
         </thead>
         <tbody>
@@ -50,7 +50,7 @@
           </tr>
           <% count++; %> <% }); %> <% } else { %>
           <tr>
-            <td colspan="7">Нет активных подтверждённых броней</td>
+            <td colspan="7">Немає активних підтверджених бронювань</td>
           </tr>
           <% } %>
         </tbody>

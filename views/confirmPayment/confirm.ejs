@@ -1,35 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подтверждение оплаты</title>
-    <link rel="stylesheet" href="/css/confirm.css">
+    <title>Підтвердження оплати</title>
+    <link rel="stylesheet" href="css/confirm.css">
   </head>
   <body>
     <nav>
       <form action="/activeBooking" method="POST">
-        <button type="submit" class="nav-item">Active booking</button>
+        <button type="submit" class="nav-item">Активні бронювання</button>
       </form>
       <form action="/confirmPayment" method="POST">
-        <button type="submit" class="nav-item active">Confirm of payment</button>
+        <button type="submit" class="nav-item active">Підтвердження оплати</button>
       </form>
       <form action="/cancelRequests" method="POST">
-        <button type="submit" class="nav-item">Cancel requests</button>
+        <button type="submit" class="nav-item">Запити на скасування</button>
       </form>
     </nav>
     <table>
       <thead>
         <tr>
           <th>#</th>
-          <th>Клиент</th>
+          <th>Клієнт</th>
           <th>Телефон</th>
           <th>Дата</th>
-          <th>Время</th>
+          <th>Час</th>
           <th>Номер</th>
           <th>Ночей</th>
-          <th>Стоимость</th>
-          <th>Действия</th>
+          <th>Вартість</th>
+          <th>Дії</th>
         </tr>
       </thead>
       <tbody>
@@ -59,21 +59,21 @@
                   <input type="hidden" name="price" value="<%= book.price %>">
                   <input type="hidden" name="phoneNumber" value="<%= book.phoneNumber %>">
                   <input type="hidden" name="fullName" value="<%= book.fullName %>">
-                  <button type="submit">Подтвердить</button>
+                  <button type="submit">Підтвердити</button>
                 </form>
                 <form action="/declineBooking" method="POST" style="display:inline-block; margin-left:5px;">
                   <input type="hidden" name="userName" value="<%= book.userName %>">
                   <input type="hidden" name="fullName" value="<%= book.fullName %>">
                   <input type="hidden" name="classRoom" value="<%= book.classRoom %>">
-                  <input type="text" name="adminComment" placeholder="Причина отказа" required style="width:84%;padding: 10px; border-radius: 10px; border: 1px solid gray; margin-bottom: 5px;">
-                  <button type="submit">Отклонить</button>
+                  <input type="text" name="adminComment" placeholder="Причина відмови" required style="width:110px;">
+                  <button type="submit">Відхилити</button>
                 </form>
               </td>
             </tr>
             <% count++; %>
           <% }); %>
         <% } else { %>
-          <tr><td colspan="9">Нет активных заявок на бронирование</td></tr>
+          <tr><td colspan="9">Немає активних заявок на бронювання</td></tr>
         <% } %>
       </tbody>
     </table>

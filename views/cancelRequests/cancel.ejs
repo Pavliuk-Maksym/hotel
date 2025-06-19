@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Запросы на отмену</title>
+    <title>Запити на скасування</title>
     <link rel="stylesheet" href="css/cancel.css" />
   </head>
   <body>
     <nav>
       <form action="/activeBooking" method="POST">
-        <button type="submit" class="nav-item">Active booking</button>
+        <button type="submit" class="nav-item">Активні бронювання</button>
       </form>
       <form action="/confirmPayment" method="POST">
-        <button type="submit" class="nav-item">Confirm of payment</button>
+        <button type="submit" class="nav-item">Підтвердження оплати</button>
       </form>
       <form action="/cancelRequests" method="POST">
-        <button type="submit" class="nav-item active">Cancel requests</button>
+        <button type="submit" class="nav-item active">Запити на скасування</button>
       </form>
     </nav>
     <div class="container"> 
@@ -23,13 +23,13 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Клиент</th>
+            <th>Клієнт</th>
             <th>Телефон</th>
             <th>Дата</th>
             <th>Номер</th>
-            <th>Сумма</th>
-            <th>Возврат</th>
-            <th>Действия</th>
+            <th>Сума</th>
+            <th>Повернення</th>
+            <th>Дії</th>
           </tr>
         </thead>
         <tbody>
@@ -53,12 +53,12 @@
                   <div class="action-buttons">
                     <form action="/confirmCancel" method="POST">
                       <input type="hidden" name="requestId" value="<%= req._id %>">
-                      <button type="submit" class="confirm-btn">Подтвердить</button>
+                      <button type="submit" class="confirm-btn">Підтвердити</button>
                     </form>
                     <form action="/declineCancel" method="POST">
                       <input type="hidden" name="requestId" value="<%= req._id %>">
-                      <input type="text" name="adminComment" placeholder="Причина отказа" required>
-                      <button type="submit" class="decline-btn">Отклонить</button>
+                      <input type="text" name="adminComment" placeholder="Причина відмови" required>
+                      <button type="submit" class="decline-btn">Відхилити</button>
                     </form>
                   </div>
                 </td>
@@ -67,7 +67,7 @@
             <% }); %>
           <% } else { %>
             <tr>
-              <td colspan="8">Нет активных заявок на отмену</td>
+              <td colspan="8">Немає активних заявок на скасування</td>
             </tr>
           <% } %>
         </tbody>
