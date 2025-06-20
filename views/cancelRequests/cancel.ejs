@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Запити на скасування</title>
-    <link rel="stylesheet" href="css/cancel.css" />
+    <link rel="stylesheet" href="/css/cancel.css" />
   </head>
   <body>
     <nav>
@@ -25,6 +25,7 @@
             <th>#</th>
             <th>Клієнт</th>
             <th>Телефон</th>
+            <th>Місто</th>
             <th>Дата</th>
             <th>Номер</th>
             <th>Сума</th>
@@ -40,6 +41,7 @@
                 <td><%= count %></td>
                 <td><%= req.fullName %></td>
                 <td><%= req.phoneNumber %></td>
+                <td><%= req.hotelCity || 'Не вказано' %></td>
                 <td>
                   <%= req.date ? (() => {
                     const [day, month, year] = req.date.split(':').map(Number);
@@ -67,7 +69,7 @@
             <% }); %>
           <% } else { %>
             <tr>
-              <td colspan="8">Немає активних заявок на скасування</td>
+              <td colspan="9">Немає активних заявок на скасування</td>
             </tr>
           <% } %>
         </tbody>

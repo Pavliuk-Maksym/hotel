@@ -25,6 +25,7 @@
             <th>#</th>
             <th>Клієнт</th>
             <th>Телефон</th>
+            <th>Місто</th>
             <th>Дата</th>
             <th>Номер</th>
             <th>Ночей</th>
@@ -44,6 +45,7 @@
             <td><%= count %></td>
             <td><%= book.fullName %></td>
             <td><%= book.phoneNumber %></td>
+            <td><%= book.hotelCity || 'Не вказано' %></td>
             <td>
               <%= book.date ? (() => {
                 const [day, month, year] = book.date.split(':').map(Number);
@@ -56,7 +58,7 @@
           </tr>
           <% count++; %> <% }); %> <% } else { %>
           <tr>
-            <td colspan="7">Немає активних підтверджених бронювань</td>
+            <td colspan="8">Немає активних підтверджених бронювань</td>
           </tr>
           <% } %>
         </tbody>
