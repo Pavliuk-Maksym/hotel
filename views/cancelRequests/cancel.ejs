@@ -5,6 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Запити на скасування</title>
     <link rel="stylesheet" href="/css/cancel.css" />
+    <style>
+      .filter-container {
+        margin: 120px auto 20px auto;
+        width: 85%;
+        text-align: center;
+      }
+      .filter-select {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: white;
+        cursor: pointer;
+      }
+      .filter-select:focus {
+        outline: none;
+        border-color: #db8018;
+      }
+      th {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+      }
+      th:hover {
+        background-color: #e6e6e6;
+      }
+      th::after {
+        content: '↕';
+        position: absolute;
+        right: 8px;
+        color: #999;
+        font-size: 12px;
+      }
+      th.sort-asc::after {
+        content: '↑';
+        color: #db8018;
+      }
+      th.sort-desc::after {
+        content: '↓';
+        color: #db8018;
+      }
+    </style>
   </head>
   <body>
     <nav>
@@ -18,39 +60,42 @@
         <button type="submit" class="nav-item active">Запити на скасування</button>
       </form>
     </nav>
+    
+    
+    
     <div class="container"> 
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Клієнт</th>
-            <th>Телефон</th>
-            <th>Місто</th>
-            <th>Дата</th>
-            <th>Номер</th>
-            <th>Сума</th>
-            <th>Повернення</th>
+            <th onclick="sortTable(0)">#</th>
+            <th onclick="sortTable(1)">Клієнт</th>
+            <th onclick="sortTable(2)">Телефон</th>
+            <th onclick="sortTable(3)">Місто</th>
+            <th onclick="sortTable(4)">Дата</th>
+            <th onclick="sortTable(5)">Номер</th>
+            <th onclick="sortTable(6)">Сума</th>
+            <th onclick="sortTable(7)">Повернення</th>
             <th>Дії</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="requestsTable">
           <% let count = 1; %>
           <% if (requests && requests.length > 0) { %>
             <% requests.forEach(function(req) { %>
-              <tr>
+              <tr data-city="<%= req.hotelCity || '' %>">
                 <td><%= count %></td>
                 <td><%= req.fullName %></td>
                 <td><%= req.phoneNumber %></td>
                 <td><%= req.hotelCity || 'Не вказано' %></td>
-                <td>
+                <td data-sort="<%= req.date %>">
                   <%= req.date ? (() => {
                     const [day, month, year] = req.date.split(':').map(Number);
                     return new Date(year, month - 1, day).toLocaleDateString('uk-UA', {day: '2-digit', month: '2-digit', year: 'numeric'});
                   })() : '' %>
                 </td>
                 <td><%= req.classRoom %></td>
-                <td><%= req.price %> грн</td>
-                <td><%= req.refundAmount %> грн (<%= req.refundPercentage %>%)</td>
+                <td data-sort="<%= req.price %>"><%= req.price %> грн</td>
+                <td data-sort="<%= req.refundAmount %>"><%= req.refundAmount %> грн (<%= req.refundPercentage %>%)</td>
                 <td>
                   <div class="action-buttons">
                     <form action="/confirmCancel" method="POST">
@@ -75,5 +120,94 @@
         </tbody>
       </table>
     </div>
+
+    <script>
+      let currentSortColumn = -1;
+      let currentSortDirection = 'asc';
+
+      function filterByCity() {
+        const selectedCity = document.getElementById('cityFilter').value;
+        const rows = document.querySelectorAll('#requestsTable tr');
+        let visibleCount = 0;
+        
+        rows.forEach(function(row) {
+          const city = row.getAttribute('data-city');
+          if (selectedCity === '' || city === selectedCity) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+        
+        // Обновляем номера строк
+        let count = 1;
+        rows.forEach(function(row) {
+          if (row.style.display !== 'none') {
+            row.cells[0].textContent = count;
+            count++;
+          }
+        });
+      }
+
+      function sortTable(columnIndex) {
+        const table = document.getElementById('requestsTable');
+        const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
+        
+        // Убираем предыдущие индикаторы сортировки
+        document.querySelectorAll('th').forEach(th => {
+          th.classList.remove('sort-asc', 'sort-desc');
+        });
+        
+        // Определяем направление сортировки
+        if (currentSortColumn === columnIndex) {
+          currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          currentSortColumn = columnIndex;
+          currentSortDirection = 'asc';
+        }
+        
+        // Добавляем индикатор сортировки
+        const header = document.querySelector(`th:nth-child(${columnIndex + 1})`);
+        header.classList.add(currentSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+        
+        // Сортируем строки
+        rows.sort((a, b) => {
+          let aValue = a.cells[columnIndex].textContent.trim();
+          let bValue = b.cells[columnIndex].textContent.trim();
+          
+          // Используем data-sort если есть
+          const aSort = a.cells[columnIndex].getAttribute('data-sort');
+          const bSort = b.cells[columnIndex].getAttribute('data-sort');
+          
+          if (aSort && bSort) {
+            aValue = aSort;
+            bValue = bSort;
+          }
+          
+          // Специальная обработка для чисел
+          if (columnIndex === 6 || columnIndex === 7) { // Сума и Повернення
+            aValue = parseFloat(aValue) || 0;
+            bValue = parseFloat(bValue) || 0;
+          }
+          
+          if (currentSortDirection === 'asc') {
+            return aValue > bValue ? 1 : -1;
+          } else {
+            return aValue < bValue ? 1 : -1;
+          }
+        });
+        
+        // Переставляем строки в таблице
+        rows.forEach(row => table.appendChild(row));
+        
+        // Обновляем номера строк
+        let count = 1;
+        rows.forEach(row => {
+          row.cells[0].textContent = count;
+          count++;
+        });
+      }
+    </script>
   </body>
 </html>
